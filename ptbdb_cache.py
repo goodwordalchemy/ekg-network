@@ -15,6 +15,9 @@ except RuntimeError:
           'repository needs to be downloaded in the same directory as the notebook '
           'in order for the caching function to work')
 
+except ModuleNotFoundError:
+    print('wfdb model is not installed.  You will not be able to build a local cache from the remote ptbdb cache without it')
+
 CACHE_PATH = 'data/cached_records'
 PTBDB_PATH = 'ptbdb'
 
