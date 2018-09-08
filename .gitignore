@@ -8,3 +8,4 @@ environment.sh
 models
 *.sw*
 *.ipynb
+ekg-network-sa-keyfile.json
