@@ -1,6 +1,9 @@
+from io import BytesIO
 import os
 import pickle
 import requests
+
+from gs_utils import get_bucket
 
 try:
     import wfdb
@@ -55,7 +58,8 @@ def _get_record_cache_path(record_name):
 
     return os.path.join(CACHE_PATH, record_name)
 
-def load_records():
+
+def _load_records_local():
     cached_records_list = os.listdir(CACHE_PATH)
     print('loading {} cached ptbdb records'.format(len(cached_records_list)))
 
@@ -67,6 +71,32 @@ def load_records():
             records[record_name] = pickle.load(f)
 
     return records
+
+
+def _load_records_from_google_storage():
+    bucket = get_bucket()
+
+    blobs = list(bucket.list_blobs())
+
+    records = {}
+
+    for i, blob in enumerate(blobs):
+        print('{} of {} blobs downloading'.format(i + 1, len(blobs)))
+
+        with BytesIO() as b:
+            blob.download_to_file(b)
+            b.seek(0)
+
+            records[blob.name] = pickle.load(b)
+
+    return records
+
+
+def load_records(local=False):
+    if local:
+        return _load_records_local()
+
+    return _load_records_from_google_storage()
 
 
 def cache_records(reset_cache=False):
@@ -105,7 +135,7 @@ def cache_records(reset_cache=False):
 
 
         with open(_get_record_cache_path(record_path), 'wb') as f:
-            pickle.dump(record, f) 
+            pickle.dump(record, f)
 
 
 if __name__ == '__main__':
