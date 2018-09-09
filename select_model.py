@@ -183,10 +183,11 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 	print('train_scores: ', results['train_metrics'])
 	print('dev_scores: ', results['dev_metrics'])
 
-	plt.figure()
-	plt.plot(history.history['loss'])
-	plt.title(hyperparameters)
-	plt.show()
+	if show_plot:
+		plt.figure()
+		plt.plot(history.history['loss'])
+		plt.title(hyperparameters)
+		plt.show()
 
 	return results
 
