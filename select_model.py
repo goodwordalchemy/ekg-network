@@ -116,10 +116,11 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 
 	hyperparameters = get_random_hyperparameters()
 
-	print('----DEBUG----')
 	train_files, dev_files, _ = get_train_dev_test_filenames()
-	train_files = train_files[:10]
-	dev_files = dev_files[:10]
+	
+	# print('----DEBUG----')
+	# train_files = train_files[:10]
+	# dev_files = dev_files[:10]
 
 	hyperparameters = {
 		'num_hidden_units': 2,
@@ -198,12 +199,15 @@ def find_models(n_models, n_epochs):
 	if not RESULTS_DIRECTORY in os.listdir('.'):
 		os.mkdir(RESULTS_DIRECTORY)
 
+	run_name = get_time_uuid()
+	os.mkdir(os.path.join(RESULTS_DIRECTORY, run_name))
+
 	for i in range(N_MODELS):
 		print('\ntesting model {} of {}'.format(i + 1, N_MODELS))
 
 		model_result = run_model_with_random_hyperparameters(n_epochs=N_EPOCHS)
 
-		with open(RESULTS_DIRECTORY + '/' + get_time_uuid(), 'wb') as f:
+		with open(os.path.join(run_name, i), 'wb') as f:
 			pickle.dump(model_results, f)
 
 
