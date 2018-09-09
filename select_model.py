@@ -63,10 +63,10 @@ class CacheBatchGenerator(Sequence):
 
 		batch = []
 		for filename in batch_filenames:
-				with open(self.basedir + '/' + filename, 'rb') as f:
-			data = pickle.load(f)
+			with open(self.basedir + '/' + filename, 'rb') as f:
+				data = pickle.load(f)
 
-				batch.append(data)
+			batch.append(data)
 
 		batch_x, batch_y = zip(*batch)
 
