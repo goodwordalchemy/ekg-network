@@ -24,10 +24,7 @@ git clone https://github.com/goodwordalchemy/ekg-network.git
 cd ekg-network
 
 echo "Preparing EKG data."
-
-# mkdir -p data/cached_records
-
-# gsutil -m rsync -r -d gs://ekg-network/ptdb/ data/cached_records
-
-# echo "Starting ipython notebook"
-# jupyter notebook
+sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+sudo mkdir -p /mnt/disks/ptbdb
+sudo mount -o discard,defaults /dev/sdb /mnt/disks/ptbdb
+sudo chmod a+w /mnt/disks/ptbdb
