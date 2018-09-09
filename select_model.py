@@ -49,34 +49,34 @@ def get_train_dev_test_filenames(fraction=0.15):
 class CacheBatchGenerator(Sequence):
 
 	def __init__(self, filenames, batch_size, basedir=DATA_DIRECTORY):
-	self.filenames = filenames
-	self.batch_size = batch_size
-	self.basedir = basedir
+		self.filenames = filenames
+		self.batch_size = batch_size
+		self.basedir = basedir
 
 	def __len__(self):
-	return int(np.ceil(len(self.filenames) / float(self.batch_size)))
+		return int(np.ceil(len(self.filenames) / float(self.batch_size)))
 
 	def __getitem__(self, idx):
-	print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
+		print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
 
-	batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
+		batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
-	batch = []
-	for filename in batch_filenames:
-			with open(self.basedir + '/' + filename, 'rb') as f:
-		data = pickle.load(f)
+		batch = []
+		for filename in batch_filenames:
+				with open(self.basedir + '/' + filename, 'rb') as f:
+			data = pickle.load(f)
 
-			batch.append(data)
+				batch.append(data)
 
-	batch_x, batch_y = zip(*batch)
+		batch_x, batch_y = zip(*batch)
 
-	batch_x = [pad_sequence(x) for x in batch_x]
-	batch_x = np.stack(batch_x)
+		batch_x = [pad_sequence(x) for x in batch_x]
+		batch_x = np.stack(batch_x)
 
-	batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
-	batch_y = np.array(batch_y).reshape(-1, 1)
+		batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
+		batch_y = np.array(batch_y).reshape(-1, 1)
 
-	return batch_x, batch_y
+		return batch_x, batch_y
 
 
 def f1_score(y_true, y_pred):
