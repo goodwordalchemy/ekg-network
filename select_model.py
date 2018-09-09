@@ -200,14 +200,15 @@ def find_models(n_models, n_epochs):
 		os.mkdir(RESULTS_DIRECTORY)
 
 	run_name = get_time_uuid()
-	os.mkdir(os.path.join(RESULTS_DIRECTORY, run_name))
+	run_dir = os.path.join(RESULTS_DIRECTORY, run_name)
+	os.mkdir(run_dir)
 
 	for i in range(N_MODELS):
 		print('\ntesting model {} of {}'.format(i + 1, N_MODELS))
 
 		model_result = run_model_with_random_hyperparameters(n_epochs=N_EPOCHS)
 
-		with open(os.path.join(run_name, str(i)), 'wb') as f:
+		with open(os.path.join(run_dir, str(i)), 'wb') as f:
 			pickle.dump(model_results, f)
 
 
