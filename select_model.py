@@ -17,8 +17,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-N_MODELS = 5
-N_EPOCHS = 10
+N_MODELS = 2
+N_EPOCHS = 2
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 # DATA_DIRECTORY = 'data/cached_records'
@@ -118,15 +118,15 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 
 	train_files, dev_files, _ = get_train_dev_test_filenames()
 	
-	# print('----DEBUG----')
-	# train_files = train_files[:10]
-	# dev_files = dev_files[:10]
-
+	print('----DEBUG----')
+	train_files = train_files[:10]
+	dev_files = dev_files[:10]
 	hyperparameters = {
 		'num_hidden_units': 2,
 		'batch_size': 10,
 		'learning_rate': 0.0001
 	}
+	print('----END_DEBUG----')
 
 
 	print('trying parameters: {}'.format(hyperparameters))
