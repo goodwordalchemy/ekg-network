@@ -1,7 +1,7 @@
 export INSTANCE_NAME="ekg-network"
 export MACHINE_TYPE="n1-standard-8"
 
-export ENABLE_CREATING_REMOTE_SERVER=false
+export ENABLE_CREATING_REMOTE_SERVER=true
 export GPU_STARTUP_WAIT_TIME=30
 export RUN_AT_STARTUP_SCRIPT="run-at-startup-on-remote-server.sh"
 export PROJECT_SERVICE_ACCOUNT_KEYFILE="ekg-network-sa-keyfile.json"
