@@ -34,4 +34,6 @@ echo "Running startup script on remote server"
 gcloud compute scp ./$RUN_AT_STARTUP_SCRIPT ekg-network:~/$RUN_AT_STARTUP_SCRIPT
 gcloud compute scp $PROJECT_SERVICE_ACCOUNT_KEYFILE ekg-network:~/$PROJECT_SERVICE_ACCOUNT_KEYFILE
 
+gcloud compute instances attach-disk $INSTANCE_NAME --disk ptbdb-data
+
 gcloud compute ssh $INSTANCE_NAME --command "source $RUN_AT_STARTUP_SCRIPT" -- -L 8080:localhost:8080
