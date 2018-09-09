@@ -1,5 +1,6 @@
-import time
+import os
 import pickle
+import time
 from random import shuffle
 
 import keras
