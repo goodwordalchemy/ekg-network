@@ -3,7 +3,7 @@ echo "Waiting for backgroud startup processes to stop."
 wait 
 
 echo "Installing miniconda3"
-# wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash miniconda.sh -b
 echo $MINICONDA_PATH_COMMAND >> ~/.bashrc
 export PATH="/home/davidgoldberg/miniconda3/bin:$PATH"
@@ -15,7 +15,7 @@ wait
 
 source activate tensorflow
 
-pip install tensorflow keras ipython notebook matplotlib
+pip install tensorflow keras ipython notebook matplotlib google-cloud-storage
 
 echo "Installing ekg-network package."
 sudo apt-get install git
@@ -29,5 +29,5 @@ echo "Preparing EKG data."
 
 # gsutil -m rsync -r -d gs://ekg-network/ptdb/ data/cached_records
 
-echo "Starting ipython notebook"
-jupyter notebook
+# echo "Starting ipython notebook"
+# jupyter notebook

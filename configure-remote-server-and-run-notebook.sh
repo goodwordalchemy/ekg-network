@@ -1,9 +1,10 @@
 export INSTANCE_NAME="ekg-network"
 export MACHINE_TYPE="n1-standard-8"
 
-export ENABLE_CREATING_REMOTE_SERVER=true
+export ENABLE_CREATING_REMOTE_SERVER=false
 export GPU_STARTUP_WAIT_TIME=30
 export RUN_AT_STARTUP_SCRIPT="run-at-startup-on-remote-server.sh"
+export PROJECT_SERVICE_ACCOUNT_KEYFILE="ekg-network-sa-keyfile.json"
 
 set -e 
 
@@ -31,6 +32,6 @@ fi
 
 echo "Running startup script on remote server"
 gcloud compute scp ./$RUN_AT_STARTUP_SCRIPT ekg-network:~/$RUN_AT_STARTUP_SCRIPT
-echo "Finished copying startup script to remote server"
+gcloud compute scp $PROJECT_SERVICE_ACCOUNT_KEYFILE ekg-network:~/$PROJECT_SERVICE_ACCOUNT_KEYFILE
 
-gcloud compute ssh $INSTANCE_NAME --command "source $RUN_AT_STARTUP_SCRIPT" -- -L 8888:localhost:8888
+gcloud compute ssh $INSTANCE_NAME --command "source $RUN_AT_STARTUP_SCRIPT" -- -L 8080:localhost:8080
