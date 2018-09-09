@@ -209,7 +209,7 @@ def find_models(n_models, n_epochs):
 		model_result = run_model_with_random_hyperparameters(n_epochs=N_EPOCHS)
 
 		with open(os.path.join(run_dir, str(i)), 'wb') as f:
-			pickle.dump(model_results, f)
+			pickle.dump(model_result, f)
 
 
 if __name__ == '__main__':
