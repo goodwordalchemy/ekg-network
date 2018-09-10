@@ -68,11 +68,14 @@ class CacheBatchGenerator(Sequence):
 		batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
 		batch = []
-		for filename in batch_filenames:
-			with open(self.basedir + '/' + filename, 'rb') as f:
-				data = pickle.load(f)
+		for i, filename in enumerate(batch_filenames):
+                    if i % 5 == 0:
+                        print('loading file {} of {}'.format(i + 1, len(batch_filenames)))
 
-			batch.append(data)
+                    with open(self.basedir + '/' + filename, 'rb') as f:
+                            data = pickle.load(f)
+
+                    batch.append(data)
 
 		batch_x, batch_y = zip(*batch)
 
@@ -145,13 +148,14 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 	optimizer = Adam(lr=learning_rate)
 
 	model = Sequential([
-		LSTM(num_hidden_units, input_shape=(MAX_LENGTH, NUM_CHANNELS)),
-		Dense(1, activation='sigmoid'),
+            LSTM(num_hidden_units, input_shape=(MAX_LENGTH, NUM_CHANNELS)),
+            Dense(1, activation='sigmoid'),
 	])
 
-	model.compile(optimizer=optimizer,
-				  loss='binary_crossentropy',
-				  metrics=['accuracy', f1_score])
+	model.compile(
+            optimizer=optimizer, loss='binary_crossentropy',
+            metrics=['accuracy', f1_score]
+        )
 
 	results['model'] = model
 
@@ -218,7 +222,6 @@ def find_models(n_models, n_epochs):
 		del model_result['history']
 
 		with open(os.path.join(run_dir, str(i)), 'wb') as f:
-			import ipdb; ipdb.set_trace()
 			pickle.dump(model_result, f)
 
 
