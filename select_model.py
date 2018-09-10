@@ -63,11 +63,14 @@ class CacheBatchGenerator(Sequence):
 		batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
 		batch = []
-		for filename in batch_filenames:
-			with open(self.basedir + '/' + filename, 'rb') as f:
-				data = pickle.load(f)
+		for i, filename in enumerate(batch_filenames):
+                    if i % 5 == 0:
+                        print('loading file {} of {}'.format(i + 1, len(batch_filenames)))
 
-			batch.append(data)
+                    with open(self.basedir + '/' + filename, 'rb') as f:
+                            data = pickle.load(f)
+
+                    batch.append(data)
 
 		batch_x, batch_y = zip(*batch)
 
@@ -140,13 +143,14 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 	optimizer = Adam(lr=learning_rate)
 
 	model = Sequential([
-		LSTM(num_hidden_units, input_shape=(MAX_LENGTH, NUM_CHANNELS)),
-		Dense(1, activation='sigmoid'),
+            LSTM(num_hidden_units, input_shape=(MAX_LENGTH, NUM_CHANNELS)),
+            Dense(1, activation='sigmoid'),
 	])
 
-	model.compile(optimizer=optimizer,
-				  loss='binary_crossentropy',
-				  metrics=['accuracy', f1_score])
+	model.compile(
+            optimizer=optimizer, loss='binary_crossentropy',
+            metrics=['accuracy', f1_score]
+        )
 
 	results['model'] = model
 
@@ -157,13 +161,12 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 	dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=min(batch_size, len(dev_files)))
 
 	history = model.fit_generator(
-		generator=training_batch_generator,
-		validation_data=dev_batch_generator,
-		epochs=n_epochs,
-		use_multiprocessing=True,
-		workers=16,
-		max_queue_size=32,
-		verbose=2)
+            generator=training_batch_generator,
+            epochs=n_epochs,
+            use_multiprocessing=True,
+            workers=16,
+            max_queue_size=32,
+            verbose=2)
 
 	results['history'] = history
 
