@@ -17,8 +17,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-N_MODELS = 2
-N_EPOCHS = 2
+N_MODELS = 25
+N_EPOCHS = 25
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 # DATA_DIRECTORY = 'data/cached_records'
@@ -121,15 +121,15 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 
 	train_files, dev_files, _ = get_train_dev_test_filenames()
 	
-	print('----DEBUG----')
-	train_files = train_files[:10]
-	dev_files = dev_files[:10]
-	hyperparameters = {
-		'num_hidden_units': 2,
-		'batch_size': 10,
-		'learning_rate': 0.0001
-	}
-	print('----END_DEBUG----')
+	# print('----DEBUG----')
+	# train_files = train_files[:10]
+	# dev_files = dev_files[:10]
+	# hyperparameters = {
+		# 'num_hidden_units': 2,
+		# 'batch_size': 10,
+		# 'learning_rate': 0.0001
+	# }
+	# print('----END_DEBUG----')
 
 
 	print('trying parameters: {}'.format(hyperparameters))
@@ -211,8 +211,12 @@ def find_models(n_models, n_epochs):
 		print('\ntesting model {} of {}'.format(i + 1, N_MODELS))
 
 		model_result = run_model_with_random_hyperparameters(n_epochs=N_EPOCHS)
+		model_result['loss'] = model_result['history'].history['loss']
+		del model_result['model']
+		del model_result['history']
 
 		with open(os.path.join(run_dir, str(i)), 'wb') as f:
+			import ipdb; ipdb.set_trace()
 			pickle.dump(model_result, f)
 
 
