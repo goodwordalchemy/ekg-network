@@ -216,7 +216,6 @@ def find_models(n_models, n_epochs):
 		del model_result['history']
 
 		with open(os.path.join(run_dir, str(i)), 'wb') as f:
-			import ipdb; ipdb.set_trace()
 			pickle.dump(model_result, f)
 
 
