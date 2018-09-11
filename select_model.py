@@ -18,8 +18,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-N_MODELS = 25
-N_EPOCHS = 25
+N_MODELS = 15
+N_EPOCHS = 5
 
 # DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 DATA_DIRECTORY = 'data/cached_records'
@@ -27,6 +27,11 @@ RESULTS_DIRECTORY = 'results'
 # MAX_LENGTH = 120012
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
+
+NUM_HIDDEN_UNITS_MIN = 4
+NUM_HIDDEN_UNITS_MAX = 15
+BATCH_SIZE_MIN = 2
+BATCH_SIZE_MAX = 40
 
 
 def get_train_dev_test_filenames(fraction=0.15):
@@ -107,11 +112,11 @@ def f1_score(y_true, y_pred):
 def get_random_hyperparameters():
         train_batch, _, _ = get_train_dev_test_filenames()
 
-        return {
-                'num_hidden_units': np.random.randint(4, 100),
-                'batch_size': np.random.randint(10, int(len(train_batch) / 2)),
-                'learning_rate': 10**(-4 * np.random.random())
-        }
+	return {
+		'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
+		'batch_size': np.random.randint(BATCH_SIZE_MIN, BATCH_SIZE_MAX),
+		'learning_rate': 10**(-4 * np.random.random())
+	}
 
 
 def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
@@ -160,13 +165,14 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
         training_batch_generator = CacheBatchGenerator(train_files, batch_size=batch_size)
         dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=min(batch_size, len(dev_files)))
 
-        history = model.fit_generator(
-            generator=training_batch_generator,
-            epochs=n_epochs,
-            use_multiprocessing=True,
-            workers=16,
-            max_queue_size=32,
-            verbose=2)
+	history = model.fit_generator(
+		generator=training_batch_generator,
+		validation_data=dev_batch_generator,
+		epochs=n_epochs,
+		use_multiprocessing=True,
+		workers=8,
+		max_queue_size=8,
+		verbose=2)
 
         results['history'] = history
 
