@@ -63,19 +63,16 @@ class CacheBatchGenerator(Sequence):
 		return int(np.ceil(len(self.filenames) / float(self.batch_size)))
 
 	def __getitem__(self, idx):
-		print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
+		print('CacheBatchGenerator is getting batch {} of {}'.format(idx + 1, self.__len__()))
 
 		batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
 		batch = []
 		for i, filename in enumerate(batch_filenames):
-                    if i % 5 == 0:
-                        print('loading file {} of {}'.format(i + 1, len(batch_filenames)))
+			with open(self.basedir + '/' + filename, 'rb') as f:
+				data = pickle.load(f)
 
-                    with open(self.basedir + '/' + filename, 'rb') as f:
-                            data = pickle.load(f)
-
-                    batch.append(data)
+			batch.append(data)
 
 		batch_x, batch_y = zip(*batch)
 
