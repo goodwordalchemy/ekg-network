@@ -47,12 +47,23 @@ def get_train_dev_test_filenames(fraction=0.15):
 	return train, dev, test
 
 
+def load_data_files_to_array(filenames):
+    batch = []
+
+    for i, filename in enumerate(filenames):
+        with open(DATA_DIRECTORY + '/' + filename, 'rb') as f:
+            data = pickle.load(f)
+
+        batch.append(data)
+
+    return batch
+
+
 class CacheBatchGenerator(Sequence):
 
-	def __init__(self, filenames, batch_size, basedir=DATA_DIRECTORY):
+	def __init__(self, filenames, batch_size):
 		self.filenames = filenames
 		self.batch_size = batch_size
-		self.basedir = basedir
 
 	def __len__(self):
 		return int(np.ceil(len(self.filenames) / float(self.batch_size)))
@@ -62,15 +73,7 @@ class CacheBatchGenerator(Sequence):
 
 		batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
-		batch = []
-		for i, filename in enumerate(batch_filenames):
-                    if i % 5 == 0:
-                        print('loading file {} of {}'.format(i + 1, len(batch_filenames)))
-
-                    with open(self.basedir + '/' + filename, 'rb') as f:
-                            data = pickle.load(f)
-
-                    batch.append(data)
+                batch = load_data_files_to_array(batch_filenames)
 
 		batch_x, batch_y = zip(*batch)
 
