@@ -79,7 +79,7 @@ class CacheBatchGenerator(Sequence):
                 batch_x, batch_y = zip(*batch)
 
                 batch_x = pad_sequences(
-                    batch_x, dtype=batch_x[0].dtype, max_len=MAX_LENGTH
+                    batch_x, dtype=batch_x[0].dtype, maxlen=MAX_LENGTH
                 )
 
                 batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
