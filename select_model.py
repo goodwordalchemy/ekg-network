@@ -21,17 +21,16 @@ from keras.utils import Sequence
 N_MODELS = 15
 N_EPOCHS = 5
 
-# DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-DATA_DIRECTORY = 'data/cached_records'
+DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
+# DATA_DIRECTORY = 'data/cached_records'
 RESULTS_DIRECTORY = 'results'
-# MAX_LENGTH = 120012
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
 
 NUM_HIDDEN_UNITS_MIN = 4
-NUM_HIDDEN_UNITS_MAX = 15
-BATCH_SIZE_MIN = 2
-BATCH_SIZE_MAX = 40
+NUM_HIDDEN_UNITS_MAX = 25
+BATCH_SIZE_MIN = 20
+BATCH_SIZE_MAX = 100
 
 
 def get_train_dev_test_filenames(fraction=0.15):
