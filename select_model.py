@@ -22,7 +22,7 @@ N_MODELS = 15
 N_EPOCHS = 5
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-# DATA_DIRECTORY = 'data/cached_records'
+DATA_DIRECTORY = 'data/truncated_samples'
 RESULTS_DIRECTORY = 'results'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
@@ -33,18 +33,30 @@ BATCH_SIZE_MIN = 20
 BATCH_SIZE_MAX = 100
 
 
+def downsample_mis(all_filenames, target_num=1000):
+    with open('mi_filenames.txt', 'r') as f:
+        mi_filenames = f.read().split('\n')
+
+    num_to_select = len(mi_filenames) - target_num
+    all_filenames = set(all_filenames) - set(mi_filenames[:num_to_select])
+
+    return list(all_filenames)
+
+
 def get_train_dev_test_filenames(fraction=0.15):
-        ptbdb_filenames = os.listdir(DATA_DIRECTORY)
+    ptbdb_filenames = os.listdir(DATA_DIRECTORY)
 
-        shuffle(ptbdb_filenames)
+    ptbdb_filenames = downsample_mis(ptbdb_filenames)
 
-        n_holdouts = int(fraction * len(ptbdb_filenames))
+    shuffle(ptbdb_filenames)
 
-        train = ptbdb_filenames[:-2 * n_holdouts]
-        dev = ptbdb_filenames[-2 * n_holdouts: -n_holdouts]
-        test = ptbdb_filenames[-n_holdouts:]
+    n_holdouts = int(fraction * len(ptbdb_filenames))
 
-        return train, dev, test
+    train = ptbdb_filenames[:-2 * n_holdouts]
+    dev = ptbdb_filenames[-2 * n_holdouts: -n_holdouts]
+    test = ptbdb_filenames[-n_holdouts:]
+
+    return train, dev, test
 
 
 def load_data_files_to_array(filenames):
