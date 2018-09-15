@@ -21,8 +21,8 @@ from keras.utils import Sequence
 
 DATA_SUBSET_FRACTION = 0.1
 
-N_MODELS = 15
-N_EPOCHS = 5
+N_MODELS = 1
+N_EPOCHS = 1
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 DATA_DIRECTORY = 'data/truncated_samples'
@@ -61,6 +61,10 @@ def get_train_dev_filenames(fraction=0.15):
 
     shuffle(ptbdb_filenames)
 
+    if DATA_SUBSET_FRACTION < 1:
+        print('Only using {}% of data'.format(DATA_SUBSET_FRACTION * 100))
+        ptbdb_filenames = ptbdb_filenames[:int(DATA_SUBSET_FRACTION * len(ptbdb_filenames))]
+
     n_holdouts = int(fraction * len(ptbdb_filenames))
 
     train = ptbdb_filenames[:n_holdouts]
@@ -83,30 +87,30 @@ def load_data_files_to_array(filenames):
 
 class CacheBatchGenerator(Sequence):
 
-        def __init__(self, filenames, batch_size):
-                self.filenames = filenames
-                self.batch_size = batch_size
+    def __init__(self, filenames, batch_size):
+        self.filenames = filenames
+        self.batch_size = min(batch_size, len(filenames))
 
-        def __len__(self):
-                return int(np.ceil(len(self.filenames) / float(self.batch_size)))
+    def __len__(self):
+            return int(np.ceil(len(self.filenames) / float(self.batch_size)))
 
-        def __getitem__(self, idx):
-                print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
+    def __getitem__(self, idx):
+        print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
 
-                batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
+        batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
-                batch = load_data_files_to_array(batch_filenames)
+        batch = load_data_files_to_array(batch_filenames)
 
-                batch_x, batch_y = zip(*batch)
+        batch_x, batch_y = zip(*batch)
 
-                batch_x = pad_sequences(
-                    batch_x, dtype=batch_x[0].dtype, maxlen=MAX_LENGTH
-                )
+        batch_x = pad_sequences(
+            batch_x, dtype=batch_x[0].dtype, maxlen=MAX_LENGTH
+        )
 
-                batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
-                batch_y = np.array(batch_y).reshape(-1, 1)
+        batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
+        batch_y = np.array(batch_y).reshape(-1, 1)
 
-                return batch_x, batch_y
+        return batch_x, batch_y
 
 
 def f1_score(y_true, y_pred):
@@ -126,117 +130,113 @@ def f1_score(y_true, y_pred):
         recall = c1 / c3
 
         # Calculate f1_score
-        f1_score = 2 * (precision * recall) / (precision + recall + K.epsilon)
+        f1_score = 2 * (precision * recall) / (precision + recall + K.epsilon())
         return f1_score
 
 
-def create_model(hyperparameters):
+def get_random_params():
+    train_batch, _, = get_train_dev_filenames()
+
+    return {
+        'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
+        'batch_size': np.random.randint(BATCH_SIZE_MIN, BATCH_SIZE_MAX),
+        'learning_rate': 10**(-4 * np.random.uniform(low=0.5, high=1.0))
+    }
 
 
-def get_random_hyperparameters():
-        train_batch, _, = get_train_dev_filenames()
+def fit_model(params):
+    results = {}
 
-        return {
-                'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
-                'batch_size': np.random.randint(BATCH_SIZE_MIN, BATCH_SIZE_MAX),
-                'learning_rate': 10**(-4 * np.random.uniform(low=0.5, high=1.0))
-        }
+    optimizer = Adam(lr=params['learning_rate'])
+
+    model = Sequential([
+        LSTM(params['num_hidden_units'], input_shape=(MAX_LENGTH, NUM_CHANNELS)),
+        Dense(1, activation='sigmoid'),
+    ])
+
+    model.compile(
+        optimizer=optimizer, loss='binary_crossentropy',
+        metrics=['accuracy', f1_score]
+    )
+
+    results['model'] = model
+
+    # Train model
+    t_before = time.time()
+
+    train_files, dev_files = get_train_dev_filenames()
+    training_batch_generator = CacheBatchGenerator(
+        train_files, batch_size=params['batch_size']
+    )
+    dev_batch_generator = CacheBatchGenerator(
+        dev_files, batch_size=params['batch_size']
+    )
+
+    history = model.fit_generator(
+        generator=training_batch_generator, validation_data=dev_batch_generator,
+        epochs=params['epochs'],
+        use_multiprocessing=True, workers=8, max_queue_size=8,
+        verbose=2)
+
+    results['history'] = history
+
+    t_after = time.time()
+    total_time = t_after - t_before
+    results['training_time'] = total_time
+
+    return results
 
 
-def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
-        results = {}
+def run_model_with_random_params(epochs=5):
+    results = {}
 
-        hyperparameters = get_random_hyperparameters()
+    params = get_random_params()
+    params.update({'epochs': epochs})
 
-        train_files, dev_files = get_train_dev_filenames()
+    results = fit_model(params)
 
-        print('trying parameters: {}'.format(hyperparameters))
-        results['hyperparameters'] = hyperparameters
+    print('trying parameters: {}'.format(params))
+    results['parameters'] = params
 
-        batch_size = hyperparameters['batch_size']
-        num_hidden_units = hyperparameters['num_hidden_units']
-        learning_rate = hyperparameters['learning_rate']
+    # Test model
+    train_files, dev_files = get_train_dev_filenames()
+    training_batch_generator = CacheBatchGenerator(train_files, batch_size=params['batch_size'])
+    dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=params['batch_size'])
 
-        # Build model
-        optimizer = Adam(lr=learning_rate)
+    results['train_metrics'] = results['model'].evaluate_generator(training_batch_generator)
+    results['dev_metrics'] = results['model'].evaluate_generator(dev_batch_generator)
 
-        model = Sequential([
-            LSTM(num_hidden_units, input_shape=(MAX_LENGTH, NUM_CHANNELS)),
-            Dense(1, activation='sigmoid'),
-        ])
+    # Print results
+    print('metrics names: ', results['model'].metrics_names)
+    print('train_scores: ', results['train_metrics'])
+    print('dev_scores: ', results['dev_metrics'])
 
-        model.compile(
-            optimizer=optimizer, loss='binary_crossentropy',
-            metrics=['accuracy', f1_score]
-        )
-
-        results['model'] = model
-
-        # Train model
-        t_before = time.time()
-
-        training_batch_generator = CacheBatchGenerator(train_files, batch_size=batch_size)
-        dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=min(batch_size, len(dev_files)))
-
-        history = model.fit_generator(
-                generator=training_batch_generator,
-                validation_data=dev_batch_generator,
-                epochs=n_epochs,
-                use_multiprocessing=True,
-                workers=8,
-                max_queue_size=8,
-                verbose=2)
-
-        results['history'] = history
-
-        t_after = time.time()
-        total_time = t_after - t_before
-        results['training_time'] = total_time
-
-        # Test model
-        training_batch_generator = CacheBatchGenerator(train_files, batch_size=batch_size)
-        dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=min(batch_size, len(dev_files)))
-
-        results['train_metrics'] = model.evaluate_generator(training_batch_generator)
-        results['dev_metrics'] = model.evaluate_generator(dev_batch_generator)
-
-        # Print results
-        print('metrics names: ', model.metrics_names)
-        print('train_scores: ', results['train_metrics'])
-        print('dev_scores: ', results['dev_metrics'])
-
-        if show_plot:
-                plt.figure()
-                plt.plot(history.history['loss'])
-                plt.title(hyperparameters)
-                plt.show()
-
-        return results
+    return results
 
 
 def get_time_uuid():
-        return str(time.time()).split('.')[0]
+    return str(time.time()).split('.')[0]
 
 
 def find_models(n_models, n_epochs):
-        if not RESULTS_DIRECTORY in os.listdir('.'):
-                os.mkdir(RESULTS_DIRECTORY)
+    if not RESULTS_DIRECTORY in os.listdir('.'):
+        os.mkdir(RESULTS_DIRECTORY)
 
-        run_name = get_time_uuid()
-        run_dir = os.path.join(RESULTS_DIRECTORY, run_name)
-        os.mkdir(run_dir)
+    run_name = get_time_uuid()
+    run_dir = os.path.join(RESULTS_DIRECTORY, run_name)
+    os.mkdir(run_dir)
 
-        for i in range(N_MODELS):
-                print('\ntesting model {} of {}'.format(i + 1, N_MODELS))
+    for i in range(N_MODELS):
+        print('\ntesting model {} of {}'.format(i + 1, n_models))
 
-                model_result = run_model_with_random_hyperparameters(n_epochs=N_EPOCHS)
-                model_result['loss'] = model_result['history'].history['loss']
-                del model_result['model']
-                del model_result['history']
+        model_result = run_model_with_random_params(epochs=n_epochs)
+        model_result['loss'] = model_result['history'].history['loss']
+        del model_result['model']
+        del model_result['history']
 
-                with open(os.path.join(run_dir, str(i)), 'wb') as f:
-                        pickle.dump(model_result, f)
+        with open(os.path.join(run_dir, str(i)), 'wb') as f:
+            pickle.dump(model_result, f)
 
 
 if __name__ == '__main__':
-       find_models(N_MODELS, N_EPOCHS) 
+       find_models(N_MODELS, N_EPOCHS)
