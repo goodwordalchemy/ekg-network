@@ -230,9 +230,8 @@ def find_models(n_models, n_epochs):
         print('\ntesting model {} of {}'.format(i + 1, n_models))
 
         model_result = run_model_with_random_params(epochs=n_epochs)
-        model_result['loss'] = model_result['history'].history['loss']
+        model_result['history'] = model_result['history'].history
         del model_result['model']
-        del model_result['history']
 
         with open(os.path.join(run_dir, str(i)), 'wb') as f:
             pickle.dump(model_result, f)
