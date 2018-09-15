@@ -18,6 +18,9 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
+
+DATA_SUBSET_FRACTION = 0.1
+
 N_MODELS = 15
 N_EPOCHS = 5
 
@@ -51,7 +54,7 @@ def remove_test_data_filenames(all_filenames):
     return list(set(all_filenames) - set(test_filenames))
 
 
-def get_train_dev_test_filenames(fraction=0.15):
+def get_train_dev_filenames(fraction=0.15):
     ptbdb_filenames = os.listdir(DATA_DIRECTORY)
 
     ptbdb_filenames = downsample_mis(ptbdb_filenames)
@@ -60,11 +63,10 @@ def get_train_dev_test_filenames(fraction=0.15):
 
     n_holdouts = int(fraction * len(ptbdb_filenames))
 
-    train = ptbdb_filenames[:-2 * n_holdouts]
-    dev = ptbdb_filenames[-2 * n_holdouts: -n_holdouts]
-    test = ptbdb_filenames[-n_holdouts:]
+    train = ptbdb_filenames[:n_holdouts]
+    dev = ptbdb_filenames[-n_holdouts:]
 
-    return train, dev, test
+    return train, dev
 
 
 def load_data_files_to_array(filenames):
@@ -128,8 +130,11 @@ def f1_score(y_true, y_pred):
         return f1_score
 
 
+def create_model(hyperparameters):
+
+
 def get_random_hyperparameters():
-        train_batch, _, _ = get_train_dev_test_filenames()
+        train_batch, _, = get_train_dev_filenames()
 
         return {
                 'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
@@ -143,18 +148,7 @@ def run_model_with_random_hyperparameters(n_epochs=5, show_plot=False):
 
         hyperparameters = get_random_hyperparameters()
 
-        train_files, dev_files, _ = get_train_dev_test_filenames()
-        
-        # print('----DEBUG----')
-        # train_files = train_files[:10]
-        # dev_files = dev_files[:10]
-        # hyperparameters = {
-                # 'num_hidden_units': 2,
-                # 'batch_size': 10,
-                # 'learning_rate': 0.0001
-        # }
-        # print('----END_DEBUG----')
-
+        train_files, dev_files = get_train_dev_filenames()
 
         print('trying parameters: {}'.format(hyperparameters))
         results['hyperparameters'] = hyperparameters
