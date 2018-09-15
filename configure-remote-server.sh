@@ -12,7 +12,7 @@ if $ENABLE_CREATING_REMOTE_SERVER; then
 	echo "Starting Google Cloud Compute instance that has a GPU attached..."
 	gcloud compute instances create $INSTANCE_NAME \
 		--machine-type $MACHINE_TYPE \
-		--accelerator type=nvidia-tesla-k80,count=1 \
+		--accelerator type=nvidia-tesla-p100,count=1 \
 		--image-family ubuntu-1604-lts --image-project ubuntu-os-cloud \
 		--maintenance-policy TERMINATE --restart-on-failure \
 		--metadata startup-script='#!/bin/bash
@@ -36,4 +36,4 @@ gcloud compute scp $PROJECT_SERVICE_ACCOUNT_KEYFILE ekg-network:~/$PROJECT_SERVI
 
 gcloud compute instances attach-disk $INSTANCE_NAME --disk ptbdb-data
 
-gcloud compute ssh $INSTANCE_NAME --command "source $RUN_AT_STARTUP_SCRIPT" -- -L 8080:localhost:8080
+# gcloud compute ssh $INSTANCE_NAME --command "source $RUN_AT_STARTUP_SCRIPT" -- -L 8080:localhost:8080
