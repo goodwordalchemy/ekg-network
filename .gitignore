@@ -9,3 +9,5 @@ models
 *.sw*
 *.ipynb
 ekg-network-sa-keyfile.json
+__old_notebooks
+results/
