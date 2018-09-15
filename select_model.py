@@ -22,14 +22,14 @@ N_MODELS = 15
 N_EPOCHS = 5
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-DATA_DIRECTORY = 'data/truncated_samples'
+# DATA_DIRECTORY = 'data/truncated_samples'
 RESULTS_DIRECTORY = 'results'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
 
-NUM_HIDDEN_UNITS_MIN = 4
-NUM_HIDDEN_UNITS_MAX = 25
-BATCH_SIZE_MIN = 20
+NUM_HIDDEN_UNITS_MIN = 25
+NUM_HIDDEN_UNITS_MAX = 50
+BATCH_SIZE_MIN = 50
 BATCH_SIZE_MAX = 100
 
 
@@ -116,7 +116,7 @@ def f1_score(y_true, y_pred):
         recall = c1 / c3
 
         # Calculate f1_score
-        f1_score = 2 * (precision * recall) / (precision + recall)
+        f1_score = 2 * (precision * recall) / (precision + recall + K.epsilon)
         return f1_score
 
 
@@ -126,7 +126,7 @@ def get_random_hyperparameters():
         return {
                 'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
                 'batch_size': np.random.randint(BATCH_SIZE_MIN, BATCH_SIZE_MAX),
-                'learning_rate': 10**(-4 * np.random.random())
+                'learning_rate': 10**(-4 * np.random.uniform(low=0.5, high=1.0))
         }
 
 
