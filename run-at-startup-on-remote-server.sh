@@ -23,3 +23,5 @@ echo "Preparing EKG data."
 sudo mkdir -p /mnt/disks/ptbdb
 sudo mount -o discard,defaults /dev/sdb /mnt/disks/ptbdb
 sudo chmod a+w /mnt/disks/ptbdb
+git config --global user.email "goodwordalchemy@gmail.com"
+git config --global user.name "David"
