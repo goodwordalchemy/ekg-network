@@ -23,14 +23,15 @@ N_EPOCHS = 5
 
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 DATA_DIRECTORY = 'data/truncated_samples'
+TEST_DATA_FILENAME  = 'test_data_filenames.txt'
 RESULTS_DIRECTORY = 'results'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
 
-NUM_HIDDEN_UNITS_MIN = 4
+NUM_HIDDEN_UNITS_MIN = 10
 NUM_HIDDEN_UNITS_MAX = 25
-BATCH_SIZE_MIN = 20
-BATCH_SIZE_MAX = 100
+BATCH_SIZE_MIN = 75
+BATCH_SIZE_MAX = 125
 
 
 def downsample_mis(all_filenames, target_num=1000):
@@ -41,6 +42,13 @@ def downsample_mis(all_filenames, target_num=1000):
     all_filenames = set(all_filenames) - set(mi_filenames[:num_to_select])
 
     return list(all_filenames)
+
+
+def remove_test_data_filenames(all_filenames):
+    with open(TEST_DATA_FILENAME, 'r') as f:
+        test_filenames = f.read().split('\n')
+
+    return list(set(all_filenames) - set(test_filenames))
 
 
 def get_train_dev_test_filenames(fraction=0.15):
