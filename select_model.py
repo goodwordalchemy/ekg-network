@@ -18,27 +18,39 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
+from pick_params import get_param_permutuations
 
+DOWNSAMPLE_PARAMS = 1
+PARAMS = {
+    'num_hidden_units': (30, 51, 10),
+    'batch_size': (50, 101, 25),
+    'learning_rate': [0.001],
+    'epochs': [10],
+}
+
+# DEBUG PARAMS
 DATA_SUBSET_FRACTION = 0.1
+PARAMS = {
+    'num_hidden_units': [3],
+    'batch_size': [50],
+    'learning_rate': [0.001],
+    'epochs': [1],
+}
 
-N_MODELS = 1
-N_EPOCHS = 1
-
+# CONSTANTS
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-DATA_DIRECTORY = 'data/truncated_samples'
-TEST_DATA_FILENAME  = 'test_data_filenames.txt'
+DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
+
 RESULTS_DIRECTORY = 'results'
+
+MI_DATA_FILENAME = 'mi_filenames.txt'
+TEST_DATA_FILENAME  = 'test_data_filenames.txt'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
 
-NUM_HIDDEN_UNITS_MIN = 25
-NUM_HIDDEN_UNITS_MAX = 50
-BATCH_SIZE_MIN = 50
-BATCH_SIZE_MAX = 100
-
 
 def downsample_mis(all_filenames, target_num=1000):
-    with open('mi_filenames.txt', 'r') as f:
+    with open(MI_DATA_FILENAME, 'r') as f:
         mi_filenames = f.read().split('\n')
 
     num_to_select = len(mi_filenames) - target_num
@@ -62,8 +74,8 @@ def get_train_dev_filenames(fraction=0.15):
     shuffle(ptbdb_filenames)
 
     if DATA_SUBSET_FRACTION < 1:
-        print('Only using {}% of data'.format(DATA_SUBSET_FRACTION * 100))
         ptbdb_filenames = ptbdb_filenames[:int(DATA_SUBSET_FRACTION * len(ptbdb_filenames))]
+        print('Only using {}% of data: {} samples'.format(DATA_SUBSET_FRACTION * 100, len(ptbdb_filenames)))
 
     n_holdouts = int(fraction * len(ptbdb_filenames))
 
@@ -134,14 +146,10 @@ def f1_score(y_true, y_pred):
         return f1_score
 
 
-def get_random_params():
-    train_batch, _, = get_train_dev_filenames()
+def get_random_params_list(n):
+    perms = get_param_permutuations(PARAMS)
 
-    return {
-        'num_hidden_units': np.random.randint(NUM_HIDDEN_UNITS_MIN, NUM_HIDDEN_UNITS_MAX),
-        'batch_size': np.random.randint(BATCH_SIZE_MIN, BATCH_SIZE_MAX),
-        'learning_rate': 10**(-4 * np.random.uniform(low=0.5, high=1.0))
-    }
+    return np.random.choice(perms, size=n, replace=False)
 
 
 def fit_model(params):
@@ -190,8 +198,8 @@ def fit_model(params):
 def run_model_with_random_params(epochs=5):
     results = {}
 
-    params = get_random_params()
-    params.update({'epochs': epochs})
+    params = get_random_params_list()
+    perms = get_param_permutuations(PARAMS)
 
     results = fit_model(params)
 
@@ -218,7 +226,7 @@ def get_time_uuid():
     return str(time.time()).split('.')[0]
 
 
-def find_models(n_models, n_epochs):
+def find_models():
     if not RESULTS_DIRECTORY in os.listdir('.'):
         os.mkdir(RESULTS_DIRECTORY)
 
@@ -226,10 +234,19 @@ def find_models(n_models, n_epochs):
     run_dir = os.path.join(RESULTS_DIRECTORY, run_name)
     os.mkdir(run_dir)
 
-    for i in range(N_MODELS):
-        print('\ntesting model {} of {}'.format(i + 1, n_models))
+    params_list = get_param_permutuations(PARAMS)
 
-        model_result = run_model_with_random_params(epochs=n_epochs)
+    if DOWNSAMPLE_PARAMS < 1:
+        shuffle(params_list)
+        params_list = params_list[:int(DOWNSAMPLE_PARAMS * len(params_list))]
+
+    print('Searching through {} parameter sets'.format(len(params_list)))
+
+    for i, params in enumerate(params_list):
+        print('\ntesting model {} of {} with params: {}'.format(i + 1, len(params_list), params))
+
+        model_result = fit_model(params)
+
         model_result['history'] = model_result['history'].history
         del model_result['model']
 
@@ -238,4 +255,4 @@ def find_models(n_models, n_epochs):
 
 
 if __name__ == '__main__':
-       find_models(N_MODELS, N_EPOCHS)
+       find_models()
