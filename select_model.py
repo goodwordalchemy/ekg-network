@@ -22,24 +22,24 @@ from pick_params import get_param_permutuations
 
 DOWNSAMPLE_PARAMS = 1
 PARAMS = {
-    'num_hidden_units': (50, 29 , -10),
+    'num_hidden_units': [50, 16 ,4],
     'batch_size': (125, 74, -25),
     'learning_rate': [0.001],
     'epochs': [10],
 }
 
 # DEBUG PARAMS
-DATA_SUBSET_FRACTION = 0.1
-PARAMS = {
-    'num_hidden_units': [3],
-    'batch_size': [50],
-    'learning_rate': [0.001],
-    'epochs': [1],
-}
+DATA_SUBSET_FRACTION = 1
+# PARAMS = {
+#     'num_hidden_units': [3],
+#     'batch_size': [50],
+#     'learning_rate': [0.001],
+#     'epochs': [1],
+# }
 
 # CONSTANTS
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
+# DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
 
 RESULTS_DIRECTORY = 'results'
 
