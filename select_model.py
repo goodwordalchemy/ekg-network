@@ -197,33 +197,6 @@ def fit_model(params):
     return results
 
 
-def run_model_with_random_params(epochs=5):
-    results = {}
-
-    params = get_random_params_list()
-    perms = get_param_permutuations(PARAMS)
-
-    results = fit_model(params)
-
-    print('trying parameters: {}'.format(params))
-    results['parameters'] = params
-
-    # Test model
-    train_files, dev_files = get_train_dev_filenames()
-    training_batch_generator = CacheBatchGenerator(train_files, batch_size=params['batch_size'])
-    dev_batch_generator = CacheBatchGenerator(dev_files, batch_size=params['batch_size'])
-
-    results['train_metrics'] = results['model'].evaluate_generator(training_batch_generator)
-    results['dev_metrics'] = results['model'].evaluate_generator(dev_batch_generator)
-
-    # Print results
-    print('metrics names: ', results['model'].metrics_names)
-    print('train_scores: ', results['train_metrics'])
-    print('dev_scores: ', results['dev_metrics'])
-
-    return results
-
-
 def get_time_uuid():
     return str(time.time()).split('.')[0]
 
