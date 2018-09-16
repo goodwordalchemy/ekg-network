@@ -22,8 +22,8 @@ from pick_params import get_param_permutuations
 
 DOWNSAMPLE_PARAMS = 1
 PARAMS = {
-    'num_hidden_units': (30, 51, 10),
-    'batch_size': (50, 101, 25),
+    'num_hidden_units': (50, 29 , -10),
+    'batch_size': (125, 74, -25),
     'learning_rate': [0.001],
     'epochs': [10],
 }
