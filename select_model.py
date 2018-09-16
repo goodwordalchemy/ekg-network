@@ -125,25 +125,30 @@ class CacheBatchGenerator(Sequence):
         return batch_x, batch_y
 
 
+def count_true_predictions(y_true, y_pred):
+    return K.sum(y_true)
+
+
 def f1_score(y_true, y_pred):
-        # Count positive samples.
-        c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        c2 = K.sum(K.round(K.clip(y_pred, 0, 1))) + K.epsilon()
-        c3 = K.sum(K.round(K.clip(y_true, 0, 1))) + K.epsilon()
+    # Count positive samples.
+    c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    c2 = K.sum(K.round(K.clip(y_pred, 0, 1))) + K.epsilon()
+    c3 = K.sum(K.round(K.clip(y_true, 0, 1))) + K.epsilon()
 
-        # If there are no true samples, fix the F1 score at 0.
-        if c3 == 0:
-                return 0
+    # If there are no true samples, fix the F1 score at 0.
+    if c3 == 0:
+            return 0
 
-        # How many selected items are relevant?
-        precision = c1 / c2
+    # How many selected items are relevant?
+    precision = c1 / c2
 
-        # How many relevant items are selected?
-        recall = c1 / c3
+    # How many relevant items are selected?
+    recall = c1 / c3
 
-        # Calculate f1_score
-        f1_score = 2 * (precision * recall) / (precision + recall + K.epsilon())
-        return f1_score
+    # Calculate f1_score
+    f1_score = 2 * (precision * recall) / (precision + recall + K.epsilon())
+
+    return f1_score
 
 
 def get_random_params_list(n):
@@ -164,7 +169,7 @@ def fit_model(params):
 
     model.compile(
         optimizer=optimizer, loss='binary_crossentropy',
-        metrics=['accuracy', f1_score]
+        metrics=['accuracy', f1_score, count_true_predictions]
     )
 
     results['model'] = model
