@@ -102,12 +102,14 @@ class CacheBatchGenerator(Sequence):
     def __init__(self, filenames, batch_size):
         self.filenames = filenames
         self.batch_size = min(batch_size, len(filenames))
+        self.access_counter = 0
 
     def __len__(self):
             return int(np.ceil(len(self.filenames) / float(self.batch_size)))
 
     def __getitem__(self, idx):
-        print('CacheBatchGenerator is getting idx {} of {}'.format(idx, self.__len__()))
+        self.access_counter += 1
+        print('CacheBatchGenerator is getting idx {} of {}'.format(self.access_counter, self.__len__()))
 
         batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
