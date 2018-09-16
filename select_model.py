@@ -128,8 +128,8 @@ class CacheBatchGenerator(Sequence):
 def f1_score(y_true, y_pred):
         # Count positive samples.
         c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        c2 = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        c3 = K.sum(K.round(K.clip(y_true, 0, 1)))
+        c2 = K.sum(K.round(K.clip(y_pred, 0, 1))) + K.epsilon()
+        c3 = K.sum(K.round(K.clip(y_true, 0, 1))) + K.epsilon()
 
         # If there are no true samples, fix the F1 score at 0.
         if c3 == 0:
