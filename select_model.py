@@ -70,16 +70,16 @@ def get_train_dev_filenames(fraction=0.15):
     ptbdb_filenames = os.listdir(DATA_DIRECTORY)
 
     ptbdb_filenames = downsample_mis(ptbdb_filenames)
+    ptbdb_filenames = remove_test_data_filenames(ptbdb_filenames)
 
     shuffle(ptbdb_filenames)
 
     if DATA_SUBSET_FRACTION < 1:
         ptbdb_filenames = ptbdb_filenames[:int(DATA_SUBSET_FRACTION * len(ptbdb_filenames))]
         print('Only using {}% of data: {} samples'.format(DATA_SUBSET_FRACTION * 100, len(ptbdb_filenames)))
-
     n_holdouts = int(fraction * len(ptbdb_filenames))
 
-    train = ptbdb_filenames[:n_holdouts]
+    train = ptbdb_filenames[:-n_holdouts]
     dev = ptbdb_filenames[-n_holdouts:]
 
     return train, dev
