@@ -157,6 +157,8 @@ def get_random_params_list(n):
 def fit_model(params):
     results = {}
 
+    results['paramaeters'] = params
+
     optimizer = Adam(lr=params['learning_rate'])
 
     model = Sequential([
