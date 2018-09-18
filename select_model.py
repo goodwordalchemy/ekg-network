@@ -21,25 +21,26 @@ from keras.utils import Sequence
 from pick_params import get_param_permutuations
 
 DOWNSAMPLE_PARAMS = 1
+DATA_SUBSET_FRACTION = 1
 PARAMS = {
     'num_hidden_units': [50, 16 ,4],
     'batch_size': (125, 74, -25),
     'learning_rate': [0.001],
     'epochs': [10],
 }
+DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 
 # DEBUG PARAMS
-DATA_SUBSET_FRACTION = 1
+# DATA_SUBSET_FRACTION = .01
 # PARAMS = {
 #     'num_hidden_units': [3],
-#     'batch_size': [50],
+#     'batch_size': [10],
 #     'learning_rate': [0.001],
 #     'epochs': [1],
 # }
+# DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
 
 # CONSTANTS
-DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-# DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
 
 RESULTS_DIRECTORY = 'results'
 
@@ -125,10 +126,6 @@ class CacheBatchGenerator(Sequence):
         return batch_x, batch_y
 
 
-def count_true_predictions(y_true, y_pred):
-    return K.sum(y_true)
-
-
 def f1_score(y_true, y_pred):
     # Count positive samples.
     c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -169,7 +166,7 @@ def fit_model(params):
 
     model.compile(
         optimizer=optimizer, loss='binary_crossentropy',
-        metrics=['accuracy', f1_score, count_true_predictions]
+        metrics=['accuracy', f1_score]
     )
 
     results['model'] = model
