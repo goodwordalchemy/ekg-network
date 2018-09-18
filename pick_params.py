@@ -13,7 +13,9 @@ def _convert_param_input(params):
 
 
 def get_param_permutuations(params):
-    keys, values = zip(*params.items())
+    _params = _convert_param_input(params)
+
+    keys, values = zip(*_params.items())
     permutations = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     return permutations
@@ -24,8 +26,7 @@ if __name__ == '__main__':
         'b': [1, 2, 6, 9]
     }
 
-    converted_params = _convert_param_input(example_params)
-    params_product = get_param_permutuations(converted_params)
+    params_product = get_param_permutuations(example_params)
 
     print(params_product)
 
