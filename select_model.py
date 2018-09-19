@@ -22,7 +22,7 @@ from param_utils import params_dict_to_str
 
 DATA_SUBSET_FRACTION = 1
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-RESULTS_DIRECTORY = '/mnt/disks/results/'
+RESULTS_DIRECTORY = '/mnt/disks/ptbdb/results/'
 
 ### DEBUG PARAMS ###
 DATA_SUBSET_FRACTION = .01 / 2
