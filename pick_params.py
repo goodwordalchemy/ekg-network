@@ -12,7 +12,7 @@ def _convert_param_input(params):
     return out
 
 
-def get_param_permutuations(params):
+def get_grid_search_params(params):
     _params = _convert_param_input(params)
 
     keys, values = zip(*_params.items())

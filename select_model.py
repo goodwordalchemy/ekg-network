@@ -18,9 +18,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-from pick_params import get_param_permutuations, params_dict_to_str
+from pick_params import get_grid_search_params, params_dict_to_str
 
-DOWNSAMPLE_PARAMS = 1
 DATA_SUBSET_FRACTION = 1
 PARAMS = {
     'num_hidden_units': [32, 16 ,4],
@@ -156,7 +155,7 @@ def f1_score(y_true, y_pred):
 
 
 def get_random_params_list(n):
-    perms = get_param_permutuations(PARAMS)
+    perms = get_grid_search_params(PARAMS)
 
     return np.random.choice(perms, size=n, replace=False)
 
@@ -214,11 +213,7 @@ def find_models():
     if not os.path.exists(_get_results_path()):
         os.mkdir(_get_results_path())
 
-    params_list = get_param_permutuations(PARAMS)
-
-    if DOWNSAMPLE_PARAMS < 1:
-        shuffle(params_list)
-        params_list = params_list[:int(DOWNSAMPLE_PARAMS * len(params_list))]
+    params_list = get_grid_search_params(PARAMS)
 
     print('Searching through {} parameter sets'.format(len(params_list)))
 
