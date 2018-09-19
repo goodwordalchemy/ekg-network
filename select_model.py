@@ -18,36 +18,43 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-from pick_params import get_param_permutuations
+from pick_params import get_param_permutuations, params_dict_to_str
 
 DOWNSAMPLE_PARAMS = 1
 DATA_SUBSET_FRACTION = 1
 PARAMS = {
-    'num_hidden_units': [50, 16 ,4],
+    'num_hidden_units': [32, 16 ,4],
     'batch_size': (125, 74, -25),
     'learning_rate': [0.001],
     'epochs': [10],
 }
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
+RESULTS_DIRECTORY = '/mnt/disks/results/'
 
-# DEBUG PARAMS
-# DATA_SUBSET_FRACTION = .01
-# PARAMS = {
-#     'num_hidden_units': [3],
-#     'batch_size': [10],
-#     'learning_rate': [0.001],
-#     'epochs': [1],
-# }
-# DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
+### DEBUG PARAMS ###
+DATA_SUBSET_FRACTION = .01 / 2
+PARAMS = {
+    'num_hidden_units': [5],
+    'batch_size': [8],
+    'learning_rate': [0.005],
+    'epochs': [1],
+}
+DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
+RESULTS_DIRECTORY = 'results'
+#####################
 
 # CONSTANTS
 
-RESULTS_DIRECTORY = 'results'
 
 MI_DATA_FILENAME = 'mi_filenames.txt'
 TEST_DATA_FILENAME  = 'test_data_filenames.txt'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
+
+
+
+def _get_results_path():
+    return RESULTS_DIRECTORY
 
 
 def downsample_mis(all_filenames, target_num=1000):
@@ -204,12 +211,8 @@ def get_time_uuid():
 
 
 def find_models():
-    if not RESULTS_DIRECTORY in os.listdir('.'):
-        os.mkdir(RESULTS_DIRECTORY)
-
-    run_name = get_time_uuid()
-    run_dir = os.path.join(RESULTS_DIRECTORY, run_name)
-    os.mkdir(run_dir)
+    if not os.path.exists(_get_results_path()):
+        os.mkdir(_get_results_path())
 
     params_list = get_param_permutuations(PARAMS)
 
@@ -225,9 +228,14 @@ def find_models():
         model_result = fit_model(params)
 
         model_result['history'] = model_result['history'].history
+
+        _run_name = params_dict_to_str(params)
+        _model_path = os.path.join(_get_results_path(), _run_name + '_model.hd5')
+        model_result['model'].save(_model_path)
         del model_result['model']
 
-        with open(os.path.join(run_dir, str(i)), 'wb') as f:
+        _results_path = os.path.join(_get_results_path(), _run_name + '_results.pkl')
+        with open(_results_path, 'wb') as f:
             pickle.dump(model_result, f)
 
 
