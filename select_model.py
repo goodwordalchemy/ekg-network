@@ -209,6 +209,9 @@ def run_models_with_params(params_list):
         model_result['history'] = model_result['history'].history
 
         _run_name = params_dict_to_str(params)
+        if DATA_SUBSET_FRACTION < 1:
+            _run_name = 'debug__' + _run_name
+
         _model_path = os.path.join(_get_results_path(), _run_name + '_model.hd5')
         model_result['model'].save(_model_path)
         del model_result['model']
