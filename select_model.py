@@ -18,31 +18,17 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Input, LSTM
 from keras.utils import Sequence
 
-from pick_params import get_grid_search_params, params_dict_to_str
+from param_utils import params_dict_to_str
 
 DATA_SUBSET_FRACTION = 1
-PARAMS = {
-    'num_hidden_units': [32, 16 ,4],
-    'batch_size': (125, 74, -25),
-    'learning_rate': [0.001],
-    'epochs': [10],
-}
 DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 RESULTS_DIRECTORY = '/mnt/disks/results/'
 
 ### DEBUG PARAMS ###
 DATA_SUBSET_FRACTION = .01 / 2
-PARAMS = {
-    'num_hidden_units': [5],
-    'batch_size': [8],
-    'learning_rate': [0.005],
-    'epochs': [1],
-}
 DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
 RESULTS_DIRECTORY = 'results'
 #####################
-
-# CONSTANTS
 
 
 MI_DATA_FILENAME = 'mi_filenames.txt'
@@ -209,11 +195,9 @@ def get_time_uuid():
     return str(time.time()).split('.')[0]
 
 
-def find_models():
+def run_models_with_params(params_list):
     if not os.path.exists(_get_results_path()):
         os.mkdir(_get_results_path())
-
-    params_list = get_grid_search_params(PARAMS)
 
     print('Searching through {} parameter sets'.format(len(params_list)))
 
@@ -233,6 +217,16 @@ def find_models():
         with open(_results_path, 'wb') as f:
             pickle.dump(model_result, f)
 
-
 if __name__ == '__main__':
-       find_models()
+    import grid_search_params
+
+    ### DEBUG PARAMS ###
+    PARAMS = {
+        'num_hidden_units': [5],
+        'batch_size': [8],
+        'learning_rate': [0.005],
+        'epochs': [1],
+    }
+    ###################
+
+    grid_search_params.main(params=PARAMS)
