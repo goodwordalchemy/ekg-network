@@ -146,11 +146,7 @@ def get_random_params_list(n):
     return np.random.choice(perms, size=n, replace=False)
 
 
-def fit_model(params):
-    results = {}
-
-    results['paramaeters'] = params
-
+def create_model(params):
     optimizer = Adam(lr=params['learning_rate'])
 
     model = Sequential([
@@ -163,6 +159,11 @@ def fit_model(params):
         metrics=['accuracy', f1_score]
     )
 
+    return model
+
+def fit_model(model, params):
+    results = {}
+    results['paramaeters'] = params
     results['model'] = model
 
     # Train model
@@ -178,7 +179,7 @@ def fit_model(params):
 
     history = model.fit_generator(
         generator=training_batch_generator, validation_data=dev_batch_generator,
-        epochs=params['epochs'],
+        epochs=params['epochs'], initial_epoch=params.get('initial_epoch'),
         use_multiprocessing=True, workers=8, max_queue_size=8,
         verbose=2)
 
@@ -195,6 +196,24 @@ def get_time_uuid():
     return str(time.time()).split('.')[0]
 
 
+def fit_model_and_cache_results(model, params):
+    model_result = fit_model(model, params)
+
+    model_result['history'] = model_result['history'].history
+
+    _run_name = params_dict_to_str(params)
+    if DATA_SUBSET_FRACTION < 1:
+        _run_name = 'debug__' + _run_name
+
+    _model_path = os.path.join(_get_results_path(), _run_name + '_model.hd5')
+    model_result['model'].save(_model_path)
+    del model_result['model']
+
+    _results_path = os.path.join(_get_results_path(), _run_name + '_results.pkl')
+    with open(_results_path, 'wb') as f:
+        pickle.dump(model_result, f)
+
+
 def run_models_with_params(params_list):
     if not os.path.exists(_get_results_path()):
         os.mkdir(_get_results_path())
@@ -204,21 +223,10 @@ def run_models_with_params(params_list):
     for i, params in enumerate(params_list):
         print('\ntesting model {} of {} with params: {}'.format(i + 1, len(params_list), params))
 
-        model_result = fit_model(params)
+        model = create_model(params)
 
-        model_result['history'] = model_result['history'].history
+        fit_model_and_cache_results(model, params)
 
-        _run_name = params_dict_to_str(params)
-        if DATA_SUBSET_FRACTION < 1:
-            _run_name = 'debug__' + _run_name
-
-        _model_path = os.path.join(_get_results_path(), _run_name + '_model.hd5')
-        model_result['model'].save(_model_path)
-        del model_result['model']
-
-        _results_path = os.path.join(_get_results_path(), _run_name + '_results.pkl')
-        with open(_results_path, 'wb') as f:
-            pickle.dump(model_result, f)
 
 if __name__ == '__main__':
     import grid_search_params
