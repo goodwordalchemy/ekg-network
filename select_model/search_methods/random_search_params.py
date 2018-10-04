@@ -2,8 +2,7 @@ import os
 
 import numpy as np
 
-from config import get_config
-from select_model.fit import fit_model_and_cache_results
+from select_model.search_methods.common import run_models_with_params
 
 NUM_PARAMS = 25
 
@@ -30,19 +29,6 @@ def _get_random_search_params(params_spec, num_params=NUM_PARAMS):
     return params
 
 
-def run_models_with_params(params_list, create_model_function):
-    results_directory = get_config().get('ResultsDirectory')
-    if not os.path.exists(results_directory):
-        os.mkdir(results_directory)
-
-    print('Searching through {} parameter sets'.format(len(params_list)))
-
-    for i, params in enumerate(params_list):
-        print('\ntesting model {} of {} with params: {}'.format(i + 1, len(params_list), params))
-
-        model = create_model_function(params)
-
-        fit_model_and_cache_results(model, params)
 
 
 def main(create_model_function, params_spec):

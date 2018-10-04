@@ -1,40 +1,41 @@
-ModelName: simple_lstm
-SearchMethod: grid_search_params
-##### Grid Search Specification #####
-ParameterSpecification:
-    num_hidden_units:
-        InterpretAs: value_list
-        Values: [2, 4]
-    batch_size:
-        InterpretAs: value_range
-        Values: [4, 7, 2]
-    learning_rate:
-        InterpretAs: value_list
-        Values: [0.001]
-    epochs:
-        InterpretAs: value_list
-        Values: [1]
-##### Random Search Specification #####
-# ParameterSpecification:
-#     num_hidden_units:
-#         RandomizationType: integer
-#         Low: 2
-#         High: 4
-#     batch_size:
-#         RandomizationType: integer
-#         Low: 2
-#         High: 4
-#     learning_rate:
-#         RandomizationType: log_transformed
-#         Low: -4
-#         High: -2.5
-#     epochs:
-#         RandomizationType: value_list
-#         Low: 1
-#         High: 1
 DataSubsetFraction: .005
 DataDirectory: 'data/untracked/truncated_samples' 
 ResultsDirectory: 'data/untracked/results'
 # DATA_SUBSET_FRACTION = 1
 # DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
 # RESULTS_DIRECTORY = '/mnt/disks/ptbdb/results/'
+ModelName: simple_lstm
+##### Grid Search Specification #####
+# SearchMethod: grid_search_params
+# ParameterSpecification:
+#     num_hidden_units:
+#         InterpretAs: value_list
+#         Values: [2, 4]
+#     batch_size:
+#         InterpretAs: value_range
+#         Values: [4, 7, 2]
+#     learning_rate:
+#         InterpretAs: value_list
+#         Values: [0.001]
+#     epochs:
+#         InterpretAs: value_list
+#         Values: [1]
+##### Random Search Specification #####
+SearchMethod: random_search_params
+ParameterSpecification:
+    num_hidden_units:
+        RandomizationType: integer
+        Low: 2
+        High: 4
+    batch_size:
+        RandomizationType: integer
+        Low: 2
+        High: 4
+    learning_rate:
+        RandomizationType: log_transformed
+        Low: -4
+        High: -2.5
+    epochs:
+        RandomizationType: value_list
+        Low: 1
+        High: 1
