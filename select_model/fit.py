@@ -5,7 +5,6 @@ from random import shuffle
 
 import keras
 import keras.backend as K
-from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
 from config import get_config
@@ -39,10 +38,10 @@ def fit_model(model, params):
 
     train_files, dev_files = get_train_dev_filenames()
     training_batch_generator = CacheBatchGenerator(
-        train_files, batch_size=params['batch_size']
+        train_files, batch_size=params['batch_size'], name='training_gen'
     )
     dev_batch_generator = CacheBatchGenerator(
-        dev_files, batch_size=params['batch_size']
+        dev_files, batch_size=params['batch_size'], name='dev_gen'
     )
 
 
@@ -50,7 +49,7 @@ def fit_model(model, params):
 
     history = model.fit_generator(
         generator=training_batch_generator, validation_data=dev_batch_generator,
-        use_multiprocessing=True, workers=8, max_queue_size=8,
+        use_multiprocessing=True, workers=4, max_queue_size=4,
         verbose=2,
         **params_to_pass)
 

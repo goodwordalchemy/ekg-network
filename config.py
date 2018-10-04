@@ -1,22 +1,9 @@
 import yaml
 
-import argparse
-
-def _get_args():
-    parser = argparse.ArgumentParser(description='Run a hyperparameter search')
-    parser.add_argument('config')
-
-    args = parser.parse_args()
-
-    return args
-
+CONFIG_FILENAME = 'config.yaml'
 
 def get_config():
-    args = _get_args()
-
-    config_filename = args.config
-
-    with open(config_filename, 'r') as f:
+    with open(CONFIG_FILENAME, 'r') as f:
         config = yaml.load(f)
 
     return config

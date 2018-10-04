@@ -56,10 +56,11 @@ def get_train_dev_filenames(fraction=0.15):
     return train, dev
 
 
-def load_data_files_to_array(filenames):
+def load_data_files_to_array(filenames, name=''):
     batch = []
 
     for i, filename in enumerate(filenames):
+        print('{}: '.format(name), i, filename)
         with open(_get_data_directory() + '/' + filename, 'rb') as f:
             data = pickle.load(f)
 
@@ -70,19 +71,31 @@ def load_data_files_to_array(filenames):
 
 class CacheBatchGenerator(Sequence):
 
-    def __init__(self, filenames, batch_size):
-        self.filenames = filenames
+    def __init__(self, filenames, batch_size, name):
         self.batch_size = min(batch_size, len(filenames))
+
+        mod = len(filenames) % self.batch_size
+
+        if mod:
+            self.filenames = filenames[:-mod]
+
+        else:
+            self.filenames = filenames
+
+        self.name = name
+
 
     def __len__(self):
             return int(np.ceil(len(self.filenames) / float(self.batch_size)))
 
     def __getitem__(self, idx):
-        print('CacheBatchGenerator is getting idx {} of {}'.format(idx, len(self)))
+        print('CacheBatchGenerator:{} is getting idx {} of {}.  Batch size: {}'.format(
+            self.name, idx + 1, len(self), self.batch_size
+        ))
 
         batch_filenames = self.filenames[idx * self.batch_size:(idx + 1) * self.batch_size]
 
-        batch = load_data_files_to_array(batch_filenames)
+        batch = load_data_files_to_array(batch_filenames, name=self.name + str(idx))
 
         batch_x, batch_y = zip(*batch)
 
