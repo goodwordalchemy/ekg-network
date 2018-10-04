@@ -5,42 +5,33 @@ from random import shuffle
 
 import keras
 import keras.backend as K
-from keras.optimizers import Adam
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
-# Agg is used so plots can be saved on a remote server
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Input, LSTM
-from keras.utils import Sequence
-
-from param_utils import params_dict_to_str
-
-DATA_SUBSET_FRACTION = 1
-DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-RESULTS_DIRECTORY = '/mnt/disks/ptbdb/results/'
-
-### DEBUG PARAMS ###
-DATA_SUBSET_FRACTION = .01 / 2
-DATA_DIRECTORY = 'data/untracked/truncated_samples' # Comment out on remote server.
-RESULTS_DIRECTORY = 'data/untracked/results'
-#####################
+from config import get_config
+from data_access import CacheBatchGenerator, get_train_dev_filenames
+from utils.param_utils import params_dict_to_str
 
 
-MI_DATA_FILENAME = 'data/mi_filenames.txt'
-TEST_DATA_FILENAME  = 'data/test_data_filenames.txt'
-MAX_LENGTH = 32000
-NUM_CHANNELS = 15
+def _get_results_directory():
+    return get_config().get('ResultsDirectory')
 
+
+def _get_model_kwargs(params):
+    kwargs = {}
+
+    if 'epochs' in params:
+        kwargs['epochs'] = params['epochs']
+
+    if 'initial_epoch' in params:
+        kwargs['initial_epoch'] = params['initial_epoch']
+
+    return kwargs
 
 
 def fit_model(model, params):
     results = {}
-    results['paramaeters'] = params
+    results['parameters'] = params
     results['model'] = model
 
     # Train model
@@ -54,11 +45,14 @@ def fit_model(model, params):
         dev_files, batch_size=params['batch_size']
     )
 
+
+    params_to_pass = _get_model_kwargs(params)
+
     history = model.fit_generator(
         generator=training_batch_generator, validation_data=dev_batch_generator,
-        epochs=params['epochs'], initial_epoch=params.get('initial_epoch'),
         use_multiprocessing=True, workers=8, max_queue_size=8,
-        verbose=2)
+        verbose=2,
+        **params_to_pass)
 
     results['history'] = history.history
 
@@ -71,7 +65,7 @@ def fit_model(model, params):
 
 def _get_run_name(params):
     _run_name = params_dict_to_str(params)
-    if DATA_SUBSET_FRACTION < 1:
+    if get_config().get('DataSubsetFraction') < 1:
         _run_name = 'debug__' + _run_name
 
     return _run_name
@@ -80,14 +74,14 @@ def _get_run_name(params):
 def _get_model_path(params):
     _run_name = _get_run_name(params)
 
-    _model_path = os.path.join(RESULTS_DIRECTORY, _run_name + '_model.hd5')
+    _model_path = os.path.join(_get_results_directory(), _run_name + '_model.hd5')
 
     return _model_path
 
 def _get_results_path(params):
     _run_name = _get_run_name(params)
 
-    _results_path = os.path.join(RESULTS_DIRECTORY, _run_name + '_results.pkl')
+    _results_path = os.path.join(_get_results_directory(), _run_name + '_results.pkl')
 
     return _results_path
 

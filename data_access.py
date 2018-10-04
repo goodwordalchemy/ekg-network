@@ -1,4 +1,23 @@
-def downsample_mis(all_filenames, target_num=1000):
+from random import shuffle
+import numpy as np
+import os
+import pickle
+
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import Sequence
+
+from config import get_config
+
+MI_DATA_FILENAME = 'data/mi_filenames.txt'
+TEST_DATA_FILENAME  = 'data/test_data_filenames.txt'
+
+NUM_CHANNELS = 15
+MAX_LENGTH = 32000
+
+def _get_data_directory():
+    return get_config().get('DataDirectory')
+
+def _downsample_mis(all_filenames, target_num=1000):
     with open(MI_DATA_FILENAME, 'r') as f:
         mi_filenames = f.read().split('\n')
 
@@ -8,7 +27,7 @@ def downsample_mis(all_filenames, target_num=1000):
     return list(all_filenames)
 
 
-def remove_test_data_filenames(all_filenames):
+def _remove_test_data_filenames(all_filenames):
     with open(TEST_DATA_FILENAME, 'r') as f:
         test_filenames = f.read().split('\n')
 
@@ -16,16 +35,19 @@ def remove_test_data_filenames(all_filenames):
 
 
 def get_train_dev_filenames(fraction=0.15):
-    ptbdb_filenames = os.listdir(DATA_DIRECTORY)
+    ptbdb_filenames = os.listdir(_get_data_directory())
 
-    ptbdb_filenames = downsample_mis(ptbdb_filenames)
-    ptbdb_filenames = remove_test_data_filenames(ptbdb_filenames)
+    ptbdb_filenames = _downsample_mis(ptbdb_filenames)
+    ptbdb_filenames = _remove_test_data_filenames(ptbdb_filenames)
 
     shuffle(ptbdb_filenames)
 
-    if DATA_SUBSET_FRACTION < 1:
-        ptbdb_filenames = ptbdb_filenames[:int(DATA_SUBSET_FRACTION * len(ptbdb_filenames))]
-        print('Only using {}% of data: {} samples'.format(DATA_SUBSET_FRACTION * 100, len(ptbdb_filenames)))
+    config = get_config()
+    data_subset_fraction = config.get('DataSubsetFraction')
+
+    if data_subset_fraction < 1:
+        ptbdb_filenames = ptbdb_filenames[:int(data_subset_fraction * len(ptbdb_filenames))]
+        print('Only using {}% of data: {} samples'.format(data_subset_fraction * 100, len(ptbdb_filenames)))
     n_holdouts = int(fraction * len(ptbdb_filenames))
 
     train = ptbdb_filenames[:-n_holdouts]
@@ -38,7 +60,7 @@ def load_data_files_to_array(filenames):
     batch = []
 
     for i, filename in enumerate(filenames):
-        with open(DATA_DIRECTORY + '/' + filename, 'rb') as f:
+        with open(_get_data_directory() + '/' + filename, 'rb') as f:
             data = pickle.load(f)
 
         batch.append(data)
@@ -72,4 +94,3 @@ class CacheBatchGenerator(Sequence):
         batch_y = np.array(batch_y).reshape(-1, 1)
 
         return batch_x, batch_y
-
