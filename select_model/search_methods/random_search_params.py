@@ -1,18 +1,17 @@
+import os
+
 import numpy as np
 
 from config import get_config
 from select_model.fit import fit_model_and_cache_results
 
 NUM_PARAMS = 25
-EPOCHS = 10
 
 
-def _generate_params():
-    params = []
+def _generate_params(params_spec):
+    params = {}
 
-    param_spec = get_config().get('ParameterSpecification')
-
-    for field, spec in param_spec.items():
+    for field, spec in params_spec.items():
         r_type = spec['RandomizationType']
         low = spec['Low']
         high = spec['High']
@@ -22,19 +21,35 @@ def _generate_params():
         elif r_type == 'log_transformed':
             params[field] = 10 ** np.random.uniform(low, high)
 
-        return params
+    return params
 
 
-def get_random_search_params(num_params=NUM_PARAMS):
-    params = [_generate_params() for _ in range(num_params)]
+def _get_random_search_params(params_spec, num_params=NUM_PARAMS):
+    params = [_generate_params(params_spec) for _ in range(num_params)]
 
     return params
 
 
-def main():
-    params_list = get_random_search_params()
+def run_models_with_params(params_list, create_model_function):
+    results_directory = get_config().get('ResultsDirectory')
+    if not os.path.exists(results_directory):
+        os.mkdir(results_directory)
 
-    run_models_with_params(params_list)
+    print('Searching through {} parameter sets'.format(len(params_list)))
+
+    for i, params in enumerate(params_list):
+        print('\ntesting model {} of {} with params: {}'.format(i + 1, len(params_list), params))
+
+        model = create_model_function(params)
+
+        fit_model_and_cache_results(model, params)
+
+
+def main(create_model_function, params_spec):
+    params_list = _get_random_search_params(params_spec)
+
+    run_models_with_params(params_list, create_model_function)
+
 
 
 if __name__ == '__main__':
