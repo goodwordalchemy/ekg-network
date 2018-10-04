@@ -48,8 +48,9 @@ def fit_model(model, params):
     params_to_pass = _get_model_kwargs(params)
 
     history = model.fit_generator(
-        generator=training_batch_generator, validation_data=dev_batch_generator,
-        use_multiprocessing=True, workers=4, max_queue_size=4,
+        generator=training_batch_generator,
+        validation_data=dev_batch_generator,
+        # use_multiprocessing=True, workers=4, max_queue_size=4,
         verbose=2,
         **params_to_pass)
 
