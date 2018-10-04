@@ -26,13 +26,13 @@ RESULTS_DIRECTORY = '/mnt/disks/ptbdb/results/'
 
 ### DEBUG PARAMS ###
 DATA_SUBSET_FRACTION = .01 / 2
-DATA_DIRECTORY = 'data/truncated_samples' # Comment out on remote server.
-RESULTS_DIRECTORY = 'results'
+DATA_DIRECTORY = 'data/untracked/truncated_samples' # Comment out on remote server.
+RESULTS_DIRECTORY = 'data/untracked/results'
 #####################
 
 
-MI_DATA_FILENAME = 'mi_filenames.txt'
-TEST_DATA_FILENAME  = 'test_data_filenames.txt'
+MI_DATA_FILENAME = 'data/mi_filenames.txt'
+TEST_DATA_FILENAME  = 'data/test_data_filenames.txt'
 MAX_LENGTH = 32000
 NUM_CHANNELS = 15
 
