@@ -10,3 +10,4 @@ environment.sh
 ekg-network-sa-keyfile.json
 __old_notebooks
 results/
+cudnn-9.0-linux-x64-v7.1.tgz
