@@ -8,9 +8,6 @@ ModelName: simple_inception
 ##### Grid Search Specification #####
 SearchMethod: grid_search_params
 ParameterSpecification:
-    num_hidden_units:
-        InterpretAs: value_list
-        Values: [2, 4]
     batch_size:
         InterpretAs: value_range
         Values: [4, 7, 2]
@@ -22,10 +19,10 @@ ParameterSpecification:
         Values: [1]
     num_filters:
         InterpretAs: value_list
-        Values: [4, 8, 16]
+        Values: [16]
     num_layers:
         InterpretAs: value_list
-        Values: [1, 2, 4, 8]
+        Values: [2]
 ##### Random Search Specification #####
 # SearchMethod: random_search_params
 # ParameterSpecification:
@@ -49,3 +46,7 @@ ParameterSpecification:
 #         RandomizationType: value_list
 #         Low: 64
 #         High 64
+#     num_layers:
+#         RandomizationType: value_list
+#         Low: 2
+#         High: 2
