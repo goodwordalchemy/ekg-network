@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 
+from config import get_config
 from select_model.search_methods.common import run_models_with_params
 
 
