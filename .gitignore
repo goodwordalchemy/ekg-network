@@ -5,7 +5,6 @@ data/untracked
 wfdb
 wfdb-python/
 environment.sh
-models
 *.sw*
 *.ipynb
 ekg-network-sa-keyfile.json
