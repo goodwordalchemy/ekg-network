@@ -4,16 +4,17 @@ import numpy as np
 
 from select_model.search_methods.common import run_models_with_params
 
-NUM_PARAMS = 25
+
+def _get_num_random_experiments():
+    config = get_config()
+
+    return config.get('NumRandomExperiments')
 
 
 def _generate_params(params_spec):
     params = {}
 
     for field, spec in params_spec.items():
-        if not 'RandomizationType' in spec:
-            continue
-
         r_type = spec['RandomizationType']
         low = spec['Low']
         high = spec['High']
@@ -26,8 +27,10 @@ def _generate_params(params_spec):
     return params
 
 
-def _get_random_search_params(params_spec, num_params=NUM_PARAMS):
-    params = [_generate_params(params_spec) for _ in range(num_params)]
+def _get_random_search_params(params_spec):
+    num_random_experiments = _get_num_random_experiments()
+
+    params = [_generate_params(params_spec) for _ in range(num_random_experiments)]
 
     return params
 

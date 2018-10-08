@@ -39,3 +39,4 @@ ParameterSpecification:
         RandomizationType: value_list
         Low: 1
         High: 1
+NumRandomExperiments: 2
