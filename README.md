@@ -4,7 +4,7 @@ This is a framework for testing out different neural network models and searchin
 
 It contains tools for starting up a remote server on a google cloud compute instance and configuring it it so that it is ready to run model selection experiments.
 * `./bin/configure-remote-server.sh` sets up a google cloud compute instance and transfers some keyfiles to it.
-* `./run-at-startup-on-remote-server.sh` is to be run once the gcp instance is set up.  It downloads this same git repo, installs python, and installs tensorflow and keras, two of the libraries that this project is based on.
+* ` source ./run-at-startup-on-remote-server.sh` is to be run once the gcp instance is set up.  It downloads this same git repo, installs python, and installs tensorflow and keras, two of the libraries that this project is based on.
 
 Prospective neural network architectures are stored in the `models` directory.  Check out `models/simple_lstm.py` for an example.
 
