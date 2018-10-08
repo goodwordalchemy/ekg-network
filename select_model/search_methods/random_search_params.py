@@ -11,6 +11,9 @@ def _generate_params(params_spec):
     params = {}
 
     for field, spec in params_spec.items():
+        if not 'RandomizationType' in spec:
+            continue
+
         r_type = spec['RandomizationType']
         low = spec['Low']
         high = spec['High']
@@ -29,13 +32,10 @@ def _get_random_search_params(params_spec, num_params=NUM_PARAMS):
     return params
 
 
-
-
 def main(create_model_function, params_spec):
     params_list = _get_random_search_params(params_spec)
 
     run_models_with_params(params_list, create_model_function)
-
 
 
 if __name__ == '__main__':
