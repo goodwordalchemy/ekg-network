@@ -6,4 +6,4 @@ sudo chown davidgoldberg .config
 
 git clone https://github.com/goodwordalchemy/ekg-network.git
 cp ~/.bashrc bashrc
-sudo docker build -f ekg-network/Dockerfile -t tf .
+sudo docker build -f ekg-network/dockerfiles/Nvidia.Dockerfile -t tf .
