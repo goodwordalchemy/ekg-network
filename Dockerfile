@@ -38,7 +38,12 @@ RUN apt-get update && apt-get install -y \
 
 RUN ${PIP} install --upgrade \
     pip \
-    setuptools
+    setuptools \
+    keras \
+    ipython \
+    notebook \
+    matplotlib \
+    google-cloud-storage
 
 ARG TF_PACKAGE=tensorflow-gpu
 RUN ${PIP} install ${TF_PACKAGE}
