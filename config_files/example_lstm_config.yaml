@@ -1,9 +1,6 @@
 DataSubsetFraction: .005
-DataDirectory: 'data/untracked/truncated_samples' 
-ResultsDirectory: 'data/untracked/results'
-# DATA_SUBSET_FRACTION = 1
-# DATA_DIRECTORY = '/mnt/disks/ptbdb/data'
-# RESULTS_DIRECTORY = '/mnt/disks/ptbdb/results/'
+DataDirectory: '/mnt/disks/ptbdb/data'
+ResultsDirectory: '/mnt/disks/ptbdb/results/'
 ModelName: simple_lstm
 ##### Grid Search Specification #####
 # SearchMethod: grid_search_params

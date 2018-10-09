@@ -23,7 +23,20 @@ $ gsutil -m rsync -r -d gs://ekg-network/truncated-samples /mnt/disks/ptbdb/data
 7. Run `./run-at-startup-on-remote-server.sh`.
 8. To enter the Docker environment where you should be all set with the tools you need, run `source enter-docker-tf-gpu-environment.sh`
 9. In the docker environment, run `cd my-devel/ekg-network`
-10. To test that everything is all set, run `python3 -m select_model --config config_files/inception_grid_config.yaml`
+10. To test that everything is all set, run `python3 -m select_model --config config_files/example_inception_config.yaml`
+
+
+## Configuring Environment On Local Computer For Testing
+1. `Clone this repository: `https://github.com/goodwordalchemy/ekg-network`.  Then run `cd ekg-network`.
+2. IF THIS IS THE FIRST TIME YOU ARE DOING THIS: run the following to download the ekg data onto your local machine:
+```bash
+$ mkdir -p data/untracked/data
+$ mkdir -p data/untracked/results/
+$ gsutil -m rsync -r -d gs://ekg-network/truncated-samples data/untracked/data
+```
+3. Run `docker build -f dockerfiles/local-testing.Dockerfile -t local-testing .`
+4. Run `source scripts/enter-docker-local-environment.sh`
+5. To test that everything is all set, run `python3 -m select_model --config config_files/example_inception_config.yaml`
 
 ## Quick Tour Of The Tool
 
@@ -33,4 +46,9 @@ Hyperparameter search scripts are stored in  the `select_model/search_methods/` 
 
 There are some example configuration files in the `config_files` directory.
 
-Once everything is configured, the way to use this tool is `python -m select_model --config <config-filename>`.
+Once everything is configured, the way to use this tool is `python3 -m select_model --config <config-filename>`.
+
+## Questions?
+Hit me up or create an issue on github. I will be stoked to hear from you!
+
+There's a couple details that I left out, like how to install docker on your local machine.  I'd be happy to help you out with something like that.
