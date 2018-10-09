@@ -13,7 +13,7 @@ This is highly recommended, because there is too much data in this dataset to tr
 1. Clone this repository: `https://github.com/goodwordalchemy/ekg-network`.
 2. IF THIS IS THE FIRST TIME YOU ARE DOING THIS: you need to create a persistent disk containing ecg data.  In your terminal, run `gcloud compute disks create ptbdb-data --size 10 --type pd-ssd`.
 3. Create a Google Cloud Compute instance with a GPU and most of the tools you need to use it with keras and tensorflow.  In your terminal, run `./scripts/configure-remote-server.sh`.  You will get an error about the ptbdb disk not existing, but your server will have started.  
-4. ssh into the GCP instance: `./scripts/connect-to-instance.sh`.
+4. ssh into the GCP instance: `./scripts/connect-to-instance.sh`.  I would start a screen session if you want to be able to access your work if you get disconnected.  Just type `screen`.
 5. IF THIS IS THE FIRST TIME YOU ARE DOING THIS: you need to load your persistent disk with ptbdb data. Run the following:
 ```bash
 $ mkdir -p /mnt/disks/ptbdb/data/
