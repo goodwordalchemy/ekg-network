@@ -1,5 +1,3 @@
-echo "If you arent running this using 'source', it's not going to work"
-
 sudo docker run \
     -it \
     --runtime=nvidia \

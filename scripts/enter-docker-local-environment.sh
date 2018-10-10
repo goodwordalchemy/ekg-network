@@ -1,5 +1,3 @@
- "If you arent running this using 'source', it's not going to work"
-
 docker run \
     -it \
     -p 8888:8888 \
