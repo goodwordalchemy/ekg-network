@@ -2,7 +2,7 @@ from keras.layers import Dense, LSTM
 from keras.models import Sequential
 from keras.optimizers import Adam
 
-from metrics import f1_score
+from metrics import all_metrics
 from data_access import MAX_LENGTH, NUM_CHANNELS
 
 def create_model(params):
@@ -15,7 +15,7 @@ def create_model(params):
 
     model.compile(
         optimizer=optimizer, loss='binary_crossentropy',
-        metrics=['accuracy', f1_score]
+        metrics=['accuracy', *all_metrics]
     )
 
     return model

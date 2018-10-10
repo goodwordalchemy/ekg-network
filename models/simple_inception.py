@@ -5,7 +5,7 @@ from keras.optimizers import Adam
 
 from config import get_config
 from data_access import MAX_LENGTH, NUM_CHANNELS
-from metrics import f1_score
+from metrics import all_metrics
 
 def _get_number_of_filters(params):
     num_filters = params.get('num_filters')
@@ -54,7 +54,7 @@ def create_model(params):
     optimizer = Adam(lr=params['learning_rate'])
     model.compile(
         optimizer=optimizer, loss='binary_crossentropy',
-        metrics=['accuracy', f1_score]
+        metrics=['accuracy', *all_metrics]
     )
 
     return model
