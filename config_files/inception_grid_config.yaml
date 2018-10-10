@@ -7,7 +7,7 @@ SearchMethod: grid_search_params
 ParameterSpecification:
     batch_size:
         InterpretAs: value_list
-        Values: [200, 100, 50]
+        Values: [50]
     learning_rate:
         InterpretAs: value_list
         Values: [0.001]
@@ -16,7 +16,10 @@ ParameterSpecification:
         Values: [10]
     num_filters:
         InterpretAs: value_list
-        Values: [64, 16, 4]
+        Values: [32, 16, 4]
     num_layers:
         InterpretAs: value_list
-        Values: [4, 2, 1]
+        Values: [4, 2]
+    dropout_rate:
+        InterpretAs: value_list
+        Values: [0.5]

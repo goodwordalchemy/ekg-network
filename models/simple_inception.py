@@ -1,5 +1,5 @@
 import keras
-from keras.layers import Conv1D, Dense, MaxPooling1D, Input
+from keras.layers import Conv1D, Dense, Dropout, MaxPooling1D, Input
 from keras.models import Model
 from keras.optimizers import Adam
 
@@ -23,6 +23,11 @@ def _get_number_of_layers(params):
 
     return num_layers
 
+def _get_dropout_rate(params):
+    dropout_rate = params.get('dropout_rate', 0)
+
+    return dropout_rate
+
 
 
 def _inception_module(input_tensor, num_filters):
@@ -45,6 +50,7 @@ def create_model(params):
 
     for _ in range(_get_number_of_layers(params)):
         output = _inception_module(output, _get_number_of_filters(params))
+        output = Dropout(_get_dropout_rate(params))(output)
 
     output = keras.layers.Flatten()(output)
     output = Dense(1, activation='sigmoid')(output)
