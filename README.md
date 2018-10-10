@@ -20,9 +20,9 @@ $ mkdir -p /mnt/disks/ptbdb/data/
 $ mkdir -p /mnt/disks/ptbdb/results/
 $ gsutil -m rsync -r -d gs://ekg-network/truncated-samples /mnt/disks/ptbdb/data
 ```
-7. Run `./run-at-startup-on-remote-server.sh`.
-8. To enter the Docker environment where you should be all set with the tools you need, run `source enter-docker-tf-gpu-environment.sh`
-9. In the docker environment, run `cd my-devel/ekg-network`
+7. Run `./run-at-startup-on-remote-server.sh`.  Then `cd ekg-network`
+8. To enter the Docker environment where you should be all set with the tools you need, run `./scripts/enter-docker-tf-gpu-environment.sh`
+9. In the docker environment, run `cd my-devel`.  This will put you in the `ekg-network` directory.
 10. To test that everything is all set, run `python3 -m select_model --config config_files/example_inception_config.yaml`
 
 
