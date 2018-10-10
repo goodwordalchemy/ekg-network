@@ -56,11 +56,13 @@ def get_train_dev_filenames(fraction=0.15):
     return train, dev
 
 
-def load_data_files_to_array(filenames, name=''):
+def load_data_files_to_array(filenames, name='', verbose=False):
     batch = []
 
     for i, filename in enumerate(filenames):
-        print('{}: '.format(name), i, filename)
+        if verbose:
+            print('{}: '.format(name), i, filename)
+
         with open(_get_data_directory() + '/' + filename, 'rb') as f:
             data = pickle.load(f)
 
