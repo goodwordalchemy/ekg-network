@@ -1,6 +1,6 @@
 sudo mkdir -p /mnt/disks/ptbdb
 sudo mount -o discard,defaults /dev/sdb /mnt/disks/ptbdb
-sudo chmod a+w /mnt/disks/ptbdb
+sudo chmod -R 777 /mnt/disks/ptbdb
 
 sudo chown davidgoldberg .config
 
