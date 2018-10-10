@@ -6,6 +6,7 @@ from random import shuffle
 import keras
 import keras.backend as K
 import numpy as np
+from keras.callbacks import ReduceLROnPlateau
 
 from config import get_config
 from data_access import CacheBatchGenerator, get_train_dev_filenames
@@ -49,6 +50,9 @@ def fit_model(model, params):
 
     params_to_pass = _get_model_kwargs(params)
 
+    reduce_lr = ReduceLROnPlateau(
+        monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001
+    )
     history = model.fit_generator(
         generator=training_batch_generator,
         validation_data=dev_batch_generator,
