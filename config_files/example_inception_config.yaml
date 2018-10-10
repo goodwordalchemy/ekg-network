@@ -1,6 +1,6 @@
 DataSubsetFraction: .005
 DataDirectory: '/mnt/disks/ptbdb/data'
-ResultsDirectory: '/mnt/disks/ptbdb/results/'
+ResultsDirectory: '/mnt/disks/ptbdb/results/testing_grid_search'
 ModelName: simple_inception
 ##### Grid Search Specification #####
 SearchMethod: grid_search_params

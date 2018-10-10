@@ -11,6 +11,8 @@ from config import get_config
 from data_access import CacheBatchGenerator, get_train_dev_filenames
 from utils.param_utils import params_dict_to_str
 
+import os
+
 
 def _get_results_directory():
     return get_config().get('ResultsDirectory')
@@ -88,6 +90,8 @@ def _get_results_path(params):
 
 def fit_model_and_cache_results(model, params):
     model_result = fit_model(model, params)
+
+    os.makedirs(_get_results_directory(), exist_ok=True)
 
     _model_path = _get_model_path(params)
     model_result['model'].save(_model_path)
