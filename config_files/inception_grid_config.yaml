@@ -16,7 +16,7 @@ ParameterSpecification:
         Values: [25]
     num_filters:
         InterpretAs: value_list
-        Values: [16, 4]
+        Values: [32, 16]
     num_layers:
         InterpretAs: value_list
         Values: [4, 2]
