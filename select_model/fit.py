@@ -6,7 +6,7 @@ from random import shuffle
 import keras
 import keras.backend as K
 import numpy as np
-from keras.callbacks import ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 from config import get_config
 from data_access import CacheBatchGenerator, get_train_dev_filenames
@@ -51,13 +51,17 @@ def fit_model(model, params):
     params_to_pass = _get_model_kwargs(params)
 
     reduce_lr = ReduceLROnPlateau(
-        monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001
+        monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001, verbose=1
+    )
+    early_stopping = EarlyStopping(
+        monitor='val_loss', patience=10, verbose=1
     )
     history = model.fit_generator(
         generator=training_batch_generator,
         validation_data=dev_batch_generator,
         # use_multiprocessing=True, workers=4, max_queue_size=4,
         verbose=2,
+        callbacks=[reduce_lr, early_stopping],
         **params_to_pass)
 
     results['history'] = history.history
