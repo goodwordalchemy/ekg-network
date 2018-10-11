@@ -1,42 +1,20 @@
-import keras.backend as K
+import functools
+from keras import backend as K
+import tensorflow as tf
 
-def f1_score(y_true, y_pred):
-    _precision = precision(y_true, y_pred)
-    _recall = recall(y_true, y_pred)
+def as_keras_metric(method):
+    @functools.wraps(method)
+    def wrapper(self, args, **kwargs):
+        """ Wrapper for turning tensorflow metrics into keras metrics """
+        value, update_op = method(self, args, **kwargs)
+        K.get_session().run(tf.local_variables_initializer())
+        with tf.control_dependencies([update_op]):
+            value = tf.identity(value)
+        return value
+    return wrapper
 
-    # Calculate f1_score
-    f1_score = 2 * (_precision * _recall) / (_precision + _recall + K.epsilon())
-
-    return f1_score
-
-
-def precision(y_true, y_pred):
-    # Count positive samples.
-    c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    c2 = K.sum(K.round(K.clip(y_pred, 0, 1))) + K.epsilon()
-
-    # If there are no true predictions, fix the F1 score at 0.
-    if c2 == 0:
-            return K.epsilon()
-
-    # How many selected items are relevant?
-    _precision = c1 / c2
-
-    return _precision
-
-
-def recall(y_true, y_pred):
-    # Count positive samples.
-    c1 = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    c3 = K.sum(K.round(K.clip(y_true, 0, 1))) + K.epsilon()
-
-    # If there are no true samples, fix the F1 score at 0.
-    if c3 == 0:
-            return K.epsilon()
-
-    # How many relevant items are selected?
-    _recall = c1 / c3
-
-    return _recall
+precision = as_keras_metric(tf.metrics.precision)
+recall = as_keras_metric(tf.metrics.recall)
+f1_score = as_keras_metric(tf.contrib.metrics.f1_score)
 
 all_metrics = [f1_score, precision, recall]

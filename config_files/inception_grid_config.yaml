@@ -1,6 +1,6 @@
 DataSubsetFraction: 1
 DataDirectory: '/mnt/disks/ptbdb/data'
-ResultsDirectory: '/mnt/disks/ptbdb/results/'
+ResultsDirectory: '/mnt/disks/ptbdb/results/dropout_test'
 ModelName: simple_inception
 ##### Grid Search Specification #####
 SearchMethod: grid_search_params
@@ -10,16 +10,16 @@ ParameterSpecification:
         Values: [50]
     learning_rate:
         InterpretAs: value_list
-        Values: [0.001]
+        Values: [0.01]
     epochs:
         InterpretAs: value_list
-        Values: [10]
+        Values: [25]
     num_filters:
         InterpretAs: value_list
-        Values: [32, 16, 4]
+        Values: [16, 4]
     num_layers:
         InterpretAs: value_list
         Values: [4, 2]
     dropout_rate:
         InterpretAs: value_list
-        Values: [0.5]
+        Values: [0.01, 0.33, 0.67]
