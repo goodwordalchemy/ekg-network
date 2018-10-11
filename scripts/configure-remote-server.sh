@@ -12,7 +12,7 @@ gcloud compute \
     --image "nvidia-gpu-cloud-image-20180816" \
     --image-project "nvidia-ngc-public" \
     --boot-disk-size "200" \
-    --boot-disk-type "pd-standard" \
+    --boot-disk-type "pd-standard" 
 
 gcloud compute scp ./$RUN_AT_STARTUP_SCRIPT ekg-network:~/$RUN_AT_STARTUP_SCRIPT
 gcloud compute instances attach-disk $INSTANCE_NAME --disk ptbdb-data
