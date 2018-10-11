@@ -10,7 +10,7 @@ ParameterSpecification:
         Values: [50]
     learning_rate:
         InterpretAs: value_list
-        Values: [0.01]
+        Values: [0.001]
     epochs:
         InterpretAs: value_list
         Values: [25]
