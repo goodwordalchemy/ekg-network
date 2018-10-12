@@ -14,5 +14,7 @@ gcloud compute \
     --boot-disk-size "200" \
     --boot-disk-type "pd-standard" 
 
+sleep 5
+
 gcloud compute scp ./$RUN_AT_STARTUP_SCRIPT ekg-network:~/$RUN_AT_STARTUP_SCRIPT
 gcloud compute instances attach-disk $INSTANCE_NAME --disk ptbdb-data
