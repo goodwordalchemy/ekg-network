@@ -1,14 +1,14 @@
 import argparse
 import yaml
 
-DEFUALT_CONFIG_FILENAME = 'config.yaml'
+DEFUALT_CONFIG_FILENAME = 'config_files/example_inception_config.yaml'
 
 def get_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--config', default=DEFUALT_CONFIG_FILENAME)
 
-    args = parser.parse_args()
+    args = parser.parse_args([])
 
     return args
 
