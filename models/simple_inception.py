@@ -6,6 +6,7 @@ from keras.optimizers import Adam
 from config import get_config
 from data_access import MAX_LENGTH, NUM_CHANNELS
 from metrics import all_metrics
+from utils.standardize_input import get_standize_input_layer
 
 
 BATCH_NORM_AXIS = 1
@@ -61,6 +62,8 @@ def _inception_module(input_tensor, num_filters):
 
 def create_model(params):
     input_ecg = output = Input(shape=(MAX_LENGTH, NUM_CHANNELS))
+
+    output = get_standize_input_layer(axis=1)(output)
 
     for _ in range(_get_number_of_layers(params)):
         output = _inception_module(output, _get_number_of_filters(params))
