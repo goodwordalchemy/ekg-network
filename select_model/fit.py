@@ -11,6 +11,7 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from config import get_config
 from data_access import CacheBatchGenerator, get_train_dev_filenames
 from utils.param_utils import params_dict_to_str
+from utils.standardize_input import get_training_mean_and_std
 
 import os
 
@@ -40,11 +41,22 @@ def fit_model(model, params):
     t_before = time.time()
 
     train_files, dev_files = get_train_dev_filenames()
+
+    # get training stats
     training_batch_generator = CacheBatchGenerator(
         train_files, batch_size=params['batch_size'], name='training_gen'
     )
+    t_mean, t_std = get_training_mean_and_std(training_batch_generator)
+
+
+    training_batch_generator = CacheBatchGenerator(
+        train_files, batch_size=params['batch_size'], name='training_gen',
+        s_mean=t_mean, s_std=t_std
+    )
+
     dev_batch_generator = CacheBatchGenerator(
-        dev_files, batch_size=params['batch_size'], name='dev_gen'
+        dev_files, batch_size=params['batch_size'], name='dev_gen',
+        s_mean=t_mean, s_std=t_std
     )
 
 

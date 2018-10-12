@@ -9,10 +9,11 @@ from keras.utils import Sequence
 from config import get_config
 
 MI_DATA_FILENAME = 'data/mi_filenames.txt'
+STUBS_FILENAME = 'data/less_than_10000_samples.txt'
 TEST_DATA_FILENAME  = 'data/test_data_filenames.txt'
 
 NUM_CHANNELS = 15
-MAX_LENGTH = 32000
+MAX_LENGTH = 10000
 
 def _get_data_directory():
     return get_config().get('DataDirectory')
@@ -34,11 +35,20 @@ def _remove_test_data_filenames(all_filenames):
     return list(set(all_filenames) - set(test_filenames))
 
 
+def _remove_stubs(all_filenames):
+    with open(STUBS_FILENAME, 'r') as f:
+        test_filenames = f.read().split('\n')
+
+    return list(set(all_filenames) - set(test_filenames))
+
+
+
 def get_train_dev_filenames(fraction=0.15):
     ptbdb_filenames = os.listdir(_get_data_directory())
 
     ptbdb_filenames = _downsample_mis(ptbdb_filenames)
     ptbdb_filenames = _remove_test_data_filenames(ptbdb_filenames)
+    ptbdb_filenames = _remove_stubs(ptbdb_filenames)
 
     shuffle(ptbdb_filenames)
 
@@ -73,8 +83,11 @@ def load_data_files_to_array(filenames, name='', verbose=False):
 
 class CacheBatchGenerator(Sequence):
 
-    def __init__(self, filenames, batch_size, name):
+    def __init__(self, filenames, batch_size, name, s_mean=None, s_std=None):
         self.batch_size = min(batch_size, len(filenames))
+
+        self.s_mean = s_mean
+        self.s_std = s_std
 
         mod = len(filenames) % self.batch_size
 
@@ -85,7 +98,6 @@ class CacheBatchGenerator(Sequence):
             self.filenames = filenames
 
         self.name = name
-
 
     def __len__(self):
             return int(np.ceil(len(self.filenames) / float(self.batch_size)))
@@ -101,9 +113,15 @@ class CacheBatchGenerator(Sequence):
 
         batch_x, batch_y = zip(*batch)
 
-        batch_x = pad_sequences(
-            batch_x, dtype=batch_x[0].dtype, maxlen=MAX_LENGTH
-        )
+        batch_x = np.array(batch_x)
+
+        if self.s_mean is not None and self.s_std is not None:
+            batch_x -= self.s_mean
+            batch_x /= self.s_std
+
+        if self.s_mean is not None and self.s_std is not None:
+            batch_x -= self.s_mean
+            batch_x /= self.s_std
 
         batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
         batch_y = np.array(batch_y).reshape(-1, 1)
