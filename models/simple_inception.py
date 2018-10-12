@@ -7,6 +7,9 @@ from config import get_config
 from data_access import MAX_LENGTH, NUM_CHANNELS
 from metrics import all_metrics
 
+
+BATCH_NORM_AXIS = 1
+
 def _get_number_of_filters(params):
     num_filters = params.get('num_filters')
 
@@ -26,11 +29,11 @@ def _get_number_of_layers(params):
 
 def _get_conv_tower(input_tensor, num_filters, size):
     tower = Conv1D(num_filters, 1, padding='same')(input_tensor)
-    tower = BatchNormalization()(tower)
+    tower = BatchNormalization(axis=BATCH_NORM_AXIS)(tower)
     tower = Activation('relu')(tower)
 
     tower = Conv1D(num_filters, size, padding='same')(input_tensor)
-    tower = BatchNormalization()(tower)
+    tower = BatchNormalization(axis=BATCH_NORM_AXIS)(tower)
     tower = Activation('relu')(tower)
 
     return tower
@@ -40,7 +43,7 @@ def _get_pool_tower(input_tensor, num_filters, size):
     tower = MaxPooling1D(size, strides=1, padding='same')(input_tensor)
 
     tower = Conv1D(num_filters, 1, padding='same')(input_tensor)
-    tower = BatchNormalization()(tower)
+    tower = BatchNormalization(axis=BATCH_NORM_AXIS)(tower)
     tower = Activation('relu')(tower)
 
     return tower
