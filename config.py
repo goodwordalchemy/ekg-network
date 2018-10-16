@@ -1,3 +1,4 @@
+import sys
 import argparse
 import yaml
 
@@ -8,7 +9,10 @@ def get_args():
 
     parser.add_argument('--config', default=DEFUALT_CONFIG_FILENAME)
 
-    args = parser.parse_args([])
+    if not len(sys.argv) > 1:
+        args = parser.parse_args([])
+    else:
+        args = parser.parse_args()
 
     return args
 
