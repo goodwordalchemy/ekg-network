@@ -4,9 +4,9 @@ import tensorflow as tf
 
 def as_keras_metric(method):
     @functools.wraps(method)
-    def wrapper(self, args, **kwargs):
+    def wrapper(self, *args, **kwargs):
         """ Wrapper for turning tensorflow metrics into keras metrics """
-        value, update_op = method(self, args, **kwargs)
+        value, update_op = method(self, *args, **kwargs)
         K.get_session().run(tf.local_variables_initializer())
         with tf.control_dependencies([update_op]):
             value = tf.identity(value)
