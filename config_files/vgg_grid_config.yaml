@@ -1,7 +1,7 @@
-# DataSubsetFraction: 0.005
-DataSubsetFraction: 1
+DataSubsetFraction: 0.005
+# DataSubsetFraction: 1
 DataDirectory: '/mnt/disks/ptbdb/data'
-ResultsDirectory: '/mnt/disks/ptbdb/results/vgg_A'
+ResultsDirectory: '/mnt/disks/ptbdb/results/vgg_B'
 ModelName: vgg_net
 ##### Grid Search Specification #####
 SearchMethod: grid_search_params
@@ -21,4 +21,7 @@ ParameterSpecification:
     num_convolutions_in_each_block:
         InterpretAs: value_list
         Values: 
-            - [2, 2, 2, 2, 2]
+            - [2]
+            - [1, 1]
+            - [2, 1]
+            - [2, 2]

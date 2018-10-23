@@ -9,8 +9,6 @@ from data_access import MAX_LENGTH, NUM_CHANNELS
 from metrics import all_metrics
 
 BATCH_NORM_AXIS = 1
-NUM_OF_VGG_BLOCKS = 5
-
 
 def _get_block_num_to_fiters_mapper(params):
     filters_base_exp = params['filters_base_exp']
@@ -26,8 +24,6 @@ def _get_block_num_to_fiters_mapper(params):
 
 def _get_num_convolutions_in_each_block(params):
     num_convolutions_in_each_block = params['num_convolutions_in_each_block']
-
-    assert len(num_convolutions_in_each_block) == NUM_OF_VGG_BLOCKS
 
     return num_convolutions_in_each_block
 
@@ -67,8 +63,9 @@ def create_model(params):
     input_ecg = output = Input(shape=(MAX_LENGTH, NUM_CHANNELS))
 
     num_convolutions_in_each_block = _get_num_convolutions_in_each_block(params)
+    num_vgg_blocks = len(num_convolutions_in_each_block)
 
-    for block_num in range(NUM_OF_VGG_BLOCKS):
+    for block_num in range(num_vgg_blocks):
        num_convolutions = num_convolutions_in_each_block[block_num]
        num_filters = _get_num_filters(params, block_num)
 
