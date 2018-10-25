@@ -16,7 +16,8 @@ RUN ${PIP} install --upgrade \
     ipython \
     notebook \
     matplotlib \
-    google-cloud-storage
+    google-cloud-storage \
+    keras-metrics
 
 ARG TF_PACKAGE=tensorflow
 RUN ${PIP} install ${TF_PACKAGE}
