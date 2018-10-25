@@ -11,9 +11,6 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from config import get_config
 from data_access import CacheBatchGenerator, get_train_dev_filenames
 from utils.param_utils import params_dict_to_str
-from utils.standardize_input import get_training_mean_and_std
-
-import os
 
 
 def _get_results_directory():
