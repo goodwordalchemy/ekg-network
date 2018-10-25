@@ -1,7 +1,9 @@
-from random import shuffle
-import numpy as np
 import os
 import pickle
+
+from random import shuffle
+import numpy as np
+import pandas as pd
 
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import Sequence
@@ -16,14 +18,22 @@ NUM_CHANNELS = 15
 MAX_LENGTH = 10000
 
 def _get_data_directory():
-    return get_config().get('DataDirectory')
+    # return get_config().get('DataDirectory')
+    return 'data/untracked/data'
 
-def _downsample_mis(all_filenames, target_num=1000):
+def _downsample_mis(all_filenames, num_to_select=None):
     with open(MI_DATA_FILENAME, 'r') as f:
         mi_filenames = f.read().split('\n')
 
-    num_to_select = len(mi_filenames) - target_num
-    all_filenames = set(all_filenames) - set(mi_filenames[:num_to_select])
+    if num_to_select is None:
+        num_to_select = int(len(set(all_filenames) - set(mi_filenames)) / 2)
+
+    keep_mi_filenames = mi_filenames[:num_to_select]
+    remove_mi_filenames = set(mi_filenames) - set(keep_mi_filenames)
+
+    print(f'keeping {len(keep_mi_filenames)} mi files')
+
+    all_filenames = set(all_filenames) - remove_mi_filenames
 
     return list(all_filenames)
 
@@ -51,6 +61,7 @@ def get_train_dev_filenames(fraction=0.15):
     ptbdb_filenames = _remove_stubs(ptbdb_filenames)
 
     shuffle(ptbdb_filenames)
+    # ptbdb_filenames = sorted(ptbdb_filenames)
 
     config = get_config()
     data_subset_fraction = config.get('DataSubsetFraction')
@@ -113,15 +124,30 @@ class CacheBatchGenerator(Sequence):
 
         batch_x, batch_y = zip(*batch)
 
+
         batch_x = np.array(batch_x)
 
-        if self.s_mean is not None and self.s_std is not None:
-            batch_x -= self.s_mean
-            batch_x /= self.s_std
+        # clip_limit = 0.2
+        # batch_x = np.clip(batch_x, -clip_limit, clip_limit)
 
-        if self.s_mean is not None and self.s_std is not None:
-            batch_x -= self.s_mean
-            batch_x /= self.s_std
+        # from scipy.ndimage import uniform_filter1d
+        # batch_x = uniform_filter1d(batch_x, size=10, mode='constant', axis=1)
+
+        # from scipy.signal import medfilt
+        # batch_x = medfilt(batch_x, (1, 19, 1))
+
+        def repeat_2d_array_in_3d(array):
+            return np.repeat(array[:, np.newaxis, :], MAX_LENGTH, axis=1)
+
+        # means = np.median(batch_x, axis=1)
+        # means = repeat_2d_array_in_3d(means)
+
+        # batch_x = batch_x - means
+
+        # stds = np.std(batch_x, axis=1)
+        # stds = repeat_2d_array_in_3d(stds)
+
+        # batch_x = (batch_x - means) / stds
 
         batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
         batch_y = np.array(batch_y).reshape(-1, 1)

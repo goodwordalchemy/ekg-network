@@ -43,20 +43,20 @@ def fit_model(model, params):
     train_files, dev_files = get_train_dev_filenames()
 
     # get training stats
-    training_batch_generator = CacheBatchGenerator(
-        train_files, batch_size=params['batch_size'], name='training_gen'
-    )
-    t_mean, t_std = get_training_mean_and_std(training_batch_generator)
+    # training_batch_generator = CacheBatchGenerator(
+    #     train_files, batch_size=params['batch_size'], name='training_gen'
+    # )
+    # t_mean, t_std = get_training_mean_and_std(training_batch_generator)
 
 
     training_batch_generator = CacheBatchGenerator(
         train_files, batch_size=params['batch_size'], name='training_gen',
-        s_mean=t_mean, s_std=t_std
+        # s_mean=t_mean, s_std=t_std
     )
 
     dev_batch_generator = CacheBatchGenerator(
         dev_files, batch_size=params['batch_size'], name='dev_gen',
-        s_mean=t_mean, s_std=t_std
+        # s_mean=t_mean, s_std=t_std
     )
 
 
@@ -76,6 +76,8 @@ def fit_model(model, params):
         callbacks=[reduce_lr, early_stopping],
         **params_to_pass)
 
+    predictions = model.predict_generator(dev_batch_generator)
+    import ipdb; ipdb.set_trace()
     results['history'] = history.history
 
     t_after = time.time()
