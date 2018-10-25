@@ -19,19 +19,12 @@ MAX_LENGTH = 10000
 def _get_data_directory():
     return get_config().get('DataDirectory')
 
-def _downsample_mis(all_filenames, num_to_select=None):
+def _downsample_mis(all_filenames, target_num=1000):
     with open(MI_DATA_FILENAME, 'r') as f:
         mi_filenames = f.read().split('\n')
 
-    if num_to_select is None:
-        num_to_select = int(len(set(all_filenames) - set(mi_filenames)) / 2)
-
-    keep_mi_filenames = mi_filenames[:num_to_select]
-    remove_mi_filenames = set(mi_filenames) - set(keep_mi_filenames)
-
-    print(f'keeping {len(keep_mi_filenames)} mi files')
-
-    all_filenames = set(all_filenames) - remove_mi_filenames
+    num_to_select = len(mi_filenames) - target_num
+    all_filenames = set(all_filenames) - set(mi_filenames[:num_to_select])
 
     return list(all_filenames)
 
@@ -117,7 +110,6 @@ class CacheBatchGenerator(Sequence):
         batch = load_data_files_to_array(batch_filenames, name=self.name + str(idx))
 
         batch_x, batch_y = zip(*batch)
-
 
         batch_x = np.array(batch_x)
 
