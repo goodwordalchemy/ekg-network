@@ -83,11 +83,8 @@ def load_data_files_to_array(filenames, name='', verbose=False):
 
 class CacheBatchGenerator(Sequence):
 
-    def __init__(self, filenames, batch_size, name, s_mean=None, s_std=None):
+    def __init__(self, filenames, batch_size, name):
         self.batch_size = min(batch_size, len(filenames))
-
-        self.s_mean = s_mean
-        self.s_std = s_std
 
         mod = len(filenames) % self.batch_size
 
@@ -114,14 +111,6 @@ class CacheBatchGenerator(Sequence):
         batch_x, batch_y = zip(*batch)
 
         batch_x = np.array(batch_x)
-
-        if self.s_mean is not None and self.s_std is not None:
-            batch_x -= self.s_mean
-            batch_x /= self.s_std
-
-        if self.s_mean is not None and self.s_std is not None:
-            batch_x -= self.s_mean
-            batch_x /= self.s_std
 
         batch_y = [1 if r == 'Myocardial infarction' else 0 for r in batch_y]
         batch_y = np.array(batch_y).reshape(-1, 1)
