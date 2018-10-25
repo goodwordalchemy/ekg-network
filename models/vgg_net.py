@@ -10,6 +10,9 @@ from metrics import all_metrics
 
 BATCH_NORM_AXIS = 1
 
+def _get_filter_size(params):
+    return params['filter_size']
+
 def _get_block_num_to_fiters_mapper(params):
     filters_base_exp = params['filters_base_exp']
 
@@ -33,8 +36,8 @@ def _get_num_filters(params, block_num):
 def _get_run_batch_norm(params):
     return params.get('run_batch_norm', True)
 
-def _convolution_layer(input_tensor, num_filters, run_batch_norm):
-    output = Conv1D(num_filters, 3, padding='same')(input_tensor)
+def _convolution_layer(input_tensor, num_filters, run_batch_norm, filter_size):
+    output = Conv1D(num_filters, filter_size, padding='same')(input_tensor)
 
     if run_batch_norm:
         output = BatchNormalization(axis=BATCH_NORM_AXIS)(output)
@@ -50,9 +53,9 @@ def _max_pooling_layer(input_tensor):
     return output
 
 
-def _vgg_block(tensor, num_convolutions, num_filters, run_batch_norm):
+def _vgg_block(tensor, num_convolutions, num_filters, run_batch_norm, filter_size):
     for _ in range(num_convolutions):
-        tensor = _convolution_layer(tensor, num_filters, run_batch_norm)
+        tensor = _convolution_layer(tensor, num_filters, run_batch_norm, filter_size)
 
     tensor = _max_pooling_layer(tensor)
 
@@ -70,7 +73,8 @@ def create_model(params):
        num_filters = _get_num_filters(params, block_num)
 
        output = _vgg_block(
-            output, num_convolutions, num_filters, run_batch_norm=_get_run_batch_norm(params)
+            output, num_convolutions, num_filters, run_batch_norm=_get_run_batch_norm(params),
+            filter_size=_get_filter_size(params)
         )
 
     output = AveragePooling1D(
