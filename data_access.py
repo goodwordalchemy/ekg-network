@@ -1,7 +1,8 @@
-from random import shuffle
-import numpy as np
 import os
 import pickle
+from random import shuffle
+
+import numpy as np
 
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import Sequence
