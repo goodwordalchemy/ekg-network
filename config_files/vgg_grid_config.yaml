@@ -1,14 +1,14 @@
 DataSubsetFraction: 0.005
-# DataSubsetFraction: 1
+DataSubsetFraction: 1
 DataDirectory: '/mnt/disks/ptbdb/data'
-ResultsDirectory: '/mnt/disks/ptbdb/results/vgg_B'
+ResultsDirectory: '/mnt/disks/ptbdb/results/vgg_grid_search_A'
 ModelName: vgg_net
 ##### Grid Search Specification #####
 SearchMethod: grid_search_params
 ParameterSpecification:
     batch_size:
         InterpretAs: value_list
-        Values: [50]
+        Values: [150, 100, 50]
     learning_rate:
         InterpretAs: value_list
         Values: [0.001]
@@ -17,11 +17,15 @@ ParameterSpecification:
         Values: [25]
     filters_base_exp:
         InterpretAs: value_list
-        Values: [4]
+        Values: [4, 6, 8]
     num_convolutions_in_each_block:
         InterpretAs: value_list
         Values: 
+            - [1]
             - [2]
             - [1, 1]
             - [2, 1]
             - [2, 2]
+    filter_size:
+        InterpretAs: value_list
+        Values: [4, 32, 64]
